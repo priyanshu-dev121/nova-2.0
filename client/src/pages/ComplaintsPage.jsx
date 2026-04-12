@@ -4,7 +4,9 @@ import { ClipboardList, Plus, ChevronLeft, AlertCircle } from 'lucide-react';
 import axios from 'axios';
 import Sidebar from '../components/Sidebar';
 import API from '../api/axiosConfig'; // Standardized API handler
+import { useToast } from '../components/Toast';
 import './Dashboard.css';
+
 
 const ComplaintsPage = () => {
   const [user, setUser] = useState(null);
@@ -12,8 +14,10 @@ const ComplaintsPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ title: '', description: '', category: 'Hostel' });
   const [loading, setLoading] = useState(false);
+  const { showToast } = useToast();
   
   const navigate = useNavigate();
+
 
   useEffect(() => {
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
@@ -41,13 +45,16 @@ const ComplaintsPage = () => {
       await API.post('/complaints', formData);
       setFormData({ title: '', description: '', category: 'Hostel' });
       setShowForm(false);
+      showToast('Complaint registered. The relevant department has been notified.', 'success');
       fetchComplaints();
     } catch (err) {
       console.error('Error submitting complaint:', err);
+      showToast('Encountered an issue while logging complaint.', 'error');
     } finally {
       setLoading(false);
     }
   };
+
 
   if (!user) return null;
 

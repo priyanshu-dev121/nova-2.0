@@ -123,13 +123,14 @@ const login = async (req, res) => {
 
     if (email === adminEmail && password === adminPass) {
       return res.json({
-        _id: 'admin_root',
+        _id: '65f1a2b3c4d5e6f7a8b9c0d1',
         name: 'Campus Admin',
         email: adminEmail,
         role: 'admin',
-        token: generateToken('admin_root'),
+        token: generateToken('65f1a2b3c4d5e6f7a8b9c0d1'),
       });
     }
+
 
     // 2. Regular Login (Student & Pre-generated Faculty)
     const user = await User.findOne({ email });

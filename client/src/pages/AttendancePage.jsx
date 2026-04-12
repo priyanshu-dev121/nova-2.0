@@ -13,16 +13,19 @@ import {
 } from 'lucide-react';
 import API from '../api/axiosConfig';
 import Sidebar from '../components/Sidebar';
+import { useToast } from '../components/Toast';
 import './AttendancePage.css';
+
 
 const AttendancePage = () => {
   const [user, setUser] = useState(null);
   const [history, setHistory] = useState([]);
   const [percentage, setPercentage] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState(null);
+  const { showToast } = useToast();
   
   const navigate = useNavigate();
+
 
   useEffect(() => {
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
@@ -48,18 +51,18 @@ const AttendancePage = () => {
 
   const markToday = async () => {
     setLoading(true);
-    setMessage(null);
     try {
       const today = new Date().toISOString().split('T')[0];
       await API.post('/attendance/mark', { date: today, status: 'Present' });
-      setMessage({ type: 'success', text: 'Attendance marked successfully!' });
+      showToast('Attendance recorded! Keep up the consistency.', 'success');
       fetchAttendance();
     } catch (err) {
-      setMessage({ type: 'error', text: err.response?.data?.message || 'Error marking attendance' });
+      showToast(err.response?.data?.message || 'Biometric sync failed.', 'error');
     } finally {
       setLoading(false);
     }
   };
+
 
   const getStatusInfo = (pct) => {
     if (pct >= 85) return { label: 'Excellent', class: 'status-safe', icon: <CheckCircle2 size={16} /> };
@@ -186,22 +189,11 @@ const AttendancePage = () => {
           </div>
         </section>
 
-        <AnimatePresence>
-          {message && (
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, transition: { duration: 0.2 } }}
-              className={`message-toast ${message.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} p-4 rounded-xl fixed bottom-8 right-8 shadow-lg flex items-center gap-3`}
-            >
-              {message.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
-              {message.text}
-            </motion.div>
-          )}
-        </AnimatePresence>
+
       </main>
     </div>
   );
 };
+
 
 export default AttendancePage;

@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import API from '../../api/axiosConfig';
+import { useToast } from '../Toast';
+
 
 const AdminDashboard = ({ user }) => {
   const navigate = useNavigate();
@@ -28,6 +30,7 @@ const AdminDashboard = ({ user }) => {
   const [noticeContent, setNoticeContent] = useState('');
   const [broadcastTarget, setBroadcastTarget] = useState('All');
   const [loading, setLoading] = useState(true);
+  const { showToast } = useToast();
 
   useEffect(() => {
     fetchAdminData();
@@ -60,12 +63,13 @@ const AdminDashboard = ({ user }) => {
         target: broadcastTarget
       });
       setNoticeContent('');
-      alert(`Broadcast sent successfully to ${broadcastTarget === 'All' ? 'everyone' : broadcastTarget + 's'}.`);
+      showToast(`Broadcast sent to ${broadcastTarget === 'All' ? 'everyone' : broadcastTarget + 's'}!`, 'success');
     } catch (err) {
       console.error('Error broadcasting notice:', err);
-      alert('Failed to broadcast notice.');
+      showToast('Broadcast failed. Check console for details.', 'error');
     }
   };
+
 
   return (
     <div className="p-0 max-w-full">

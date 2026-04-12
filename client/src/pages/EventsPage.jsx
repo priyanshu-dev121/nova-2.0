@@ -88,16 +88,15 @@ const EventsPage = () => {
   };
 
   const handleDeleteEvent = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this event?')) return;
-    
     try {
       await API.delete(`/events/${id}`);
-      showToast('Event removed', 'success');
+      showToast('Event successfully deleted.', 'success');
       setEvents(events.filter(e => e._id !== id));
     } catch (err) {
-      showToast('Failed to delete event', 'error');
+      showToast('Action failed. Could not remove event.', 'error');
     }
   };
+
 
   const filteredEvents = events.filter(event => 
     event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||

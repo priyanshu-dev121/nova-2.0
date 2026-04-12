@@ -1,4 +1,6 @@
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '../components/Toast';
 import Sidebar from '../components/Sidebar';
 import API from '../api/axiosConfig'; // Standardized API handler
 import { Search, Plus, ChevronLeft, Mail, MapPin, Camera, Upload } from 'lucide-react';
@@ -11,8 +13,10 @@ const LostFoundPage = () => {
   const [formData, setFormData] = useState({ title: '', description: '', contactInfo: '' });
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const { showToast } = useToast();
   
   const navigate = useNavigate();
+
 
   useEffect(() => {
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
@@ -35,7 +39,10 @@ const LostFoundPage = () => {
 
   const handleUpload = async (e) => {
     e.preventDefault();
-    if (!file) return alert('Please upload an image of the item');
+    if (!file) {
+      showToast('Evidence required. Please upload a photo of the item.', 'error');
+      return;
+    }
 
     setLoading(true);
     const data = new FormData();
@@ -51,13 +58,16 @@ const LostFoundPage = () => {
       setShowForm(false);
       setFormData({ title: '', description: '', contactInfo: '' });
       setFile(null);
+      showToast('Item listed successfully! Help is on the way.', 'success');
       fetchItems();
     } catch (err) {
       console.error('Error reporting item:', err);
+      showToast('Database synchronization failed. Please try again.', 'error');
     } finally {
       setLoading(false);
     }
   };
+
 
   if (!user) return null;
 

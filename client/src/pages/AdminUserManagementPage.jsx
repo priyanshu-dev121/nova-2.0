@@ -13,7 +13,9 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from '../components/Sidebar';
 import API from '../api/axiosConfig';
+import { useToast } from '../components/Toast';
 import './Dashboard.css';
+
 
 const AdminUserManagementPage = () => {
   const navigate = useNavigate();
@@ -26,8 +28,10 @@ const AdminUserManagementPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
+  const { showToast } = useToast();
 
   useEffect(() => {
+
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
     if (!userInfo || userInfo.role !== 'admin') {
       navigate('/dashboard');
@@ -58,19 +62,19 @@ const AdminUserManagementPage = () => {
   };
 
   const handleDeleteUser = async (id) => {
-    if (!window.confirm('WARNING: This action is permanent. Do you really want to remove this user and all their associated data from the system?')) return;
-    
     try {
       setDeletingId(id);
       await API.delete(`/admin/users/${id}`);
       setUsers(users.filter(u => u._id !== id));
+      showToast('User permanently removed from system.', 'success');
     } catch (err) {
       console.error('Error deleting user:', err);
-      alert('Failed to delete user.');
+      showToast('Purge failed. Access restricted.', 'error');
     } finally {
       setDeletingId(null);
     }
   };
+
 
   return (
     <div className="dashboard-layout">

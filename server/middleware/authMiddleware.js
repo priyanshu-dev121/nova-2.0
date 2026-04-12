@@ -13,14 +13,15 @@ const protect = async (req, res, next) => {
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      if (decoded.id === 'admin_root') {
+      if (decoded.id === '65f1a2b3c4d5e6f7a8b9c0d1') {
         req.user = {
-          _id: 'admin_root',
+          _id: '65f1a2b3c4d5e6f7a8b9c0d1',
           name: 'System Admin',
           email: process.env.ADMIN_EMAIL || 'admin@bbdu.ac.in',
           role: 'admin'
         };
       } else {
+
         req.user = await User.findById(decoded.id).select('-password');
       }
 
