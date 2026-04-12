@@ -66,9 +66,24 @@ app.use('/api/users', userRoutes);
 
 
 // Base Route
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
   res.send('Campus Nova API is running...');
 });
+
+// Production Setup
+const path = require('path');
+if (process.env.NODE_ENV === 'production') {
+  // Set static folder
+  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+  app.get('*', (req, res) =>
+    res.sendFile(path.resolve(__dirname, '..', 'frontend', 'dist', 'index.html'))
+  );
+} else {
+  app.get('/', (req, res) => {
+    res.send('Campus Nova API is running (Development Mode)...');
+  });
+}
 
 const PORT = process.env.PORT || 5050;
 

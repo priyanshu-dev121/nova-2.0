@@ -1,0 +1,14 @@
+{
+  "name": "campus-nova-prod",
+  "version": "1.0.0",
+  "description": "Production wrapper for Campus Nova CMS",
+  "main": "backend/index.js",
+  "scripts": {
+    "start": "node backend/index.js",
+    "build": "npm run install-backend && npm run build-frontend",
+    "install-backend": "cd backend && npm install",
+    "build-frontend": "cd frontend && npm install && npm run build"
+  },
+  "author": "Campus Nova Team",
+  "license": "ISC"
+}
