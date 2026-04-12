@@ -120,22 +120,45 @@ const markAttendance = async (req, res) => {
 // Student: Get their personal attendance stats
 const getUserAttendance = async (req, res) => {
   try {
-    const totalSessions = await AttendanceSession.countDocuments({});
-    const attendedSessions = await AttendanceSession.countDocuments({
+    const allSessions = await AttendanceSession.find({});
+    const attendedSessions = await AttendanceSession.find({
       studentsMarked: req.user._id
     });
 
-    const percentage = totalSessions === 0 ? 0 : Math.round((attendedSessions / totalSessions) * 100);
+    const totalSessionsCount = allSessions.length;
+    const attendedSessionsCount = attendedSessions.length;
+    const percentage = totalSessionsCount === 0 ? 0 : Math.round((attendedSessionsCount / totalSessionsCount) * 100);
 
-    const records = await AttendanceSession.find({
-      studentsMarked: req.user._id
-    }).sort({ createdAt: -1 });
+    // Calculate subject-wise breakdown
+    const subjectMap = {};
+    
+    // Initialize all subjects encountered in any session
+    allSessions.forEach(session => {
+      if (!subjectMap[session.subject]) {
+        subjectMap[session.subject] = { name: session.subject, total: 0, present: 0 };
+      }
+      subjectMap[session.subject].total += 1;
+    });
+
+    // Count presence for active user
+    attendedSessions.forEach(session => {
+      if (subjectMap[session.subject]) {
+        subjectMap[session.subject].present += 1;
+      }
+    });
+
+    const subjectStats = Object.values(subjectMap).map(sub => ({
+      ...sub,
+      percentage: sub.total === 0 ? 0 : Math.round((sub.present / sub.total) * 100),
+      code: sub.name.split(' ').map(w => w[0]).join('').toUpperCase() + '101' // Simple fallback code
+    }));
 
     res.json({
       percentage,
-      count: attendedSessions,
-      total: totalSessions,
-      records
+      count: attendedSessionsCount,
+      total: totalSessionsCount,
+      records: attendedSessions.sort((a, b) => b.createdAt - a.createdAt),
+      subjects: subjectStats
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -187,25 +210,26 @@ const getFacultyHistory = async (req, res) => {
   }
 };
 
-// Get subjects for the dropdown (with auto-seed for demo)
+// Get subjects for the dropdown (STATIC SEED - FAILSAFE)
 const getSubjects = async (req, res) => {
   try {
-    let subjects = await Subject.find({});
-    
-    if (subjects.length === 0) {
-      const demoSubjects = [
-        { name: 'Data Structures & Algorithms', code: 'CS201' },
-        { name: 'Software Engineering', code: 'CS302' },
-        { name: 'Computer Networks', code: 'CS204' },
-        { name: 'Logic Design & Circuits', code: 'EE101' },
-        { name: 'Microprocessors', code: 'EC305' }
-      ];
-      subjects = await Subject.insertMany(demoSubjects);
-    }
-    
-    res.json(subjects);
+    const curriculum = [
+      { id: 'sub1', name: 'Differential Equations and Fourier Analysis', code: 'NBS4201' },
+      { id: 'sub2', name: 'Programming Concepts with Python', code: 'NCS4201' },
+      { id: 'sub3', name: 'Basic Electrical Engineering', code: 'NEE4201' },
+      { id: 'sub4', name: 'Engineering Chemistry', code: 'NBS4203' },
+      { id: 'sub5', name: 'Basics of Artificial Intelligence', code: 'NCS4202' },
+      { id: 'sub6', name: 'Communicative English', code: 'NHSCC1201' },
+      { id: 'sub7', name: 'Python Programming Lab', code: 'NCS4251' },
+      { id: 'sub8', name: 'Basic Electrical Engineering Lab', code: 'NEE4251' },
+      { id: 'sub9', name: 'Engineering Chemistry Lab', code: 'NBS4253' }
+    ];
+
+    // Simply return the official curriculum directly to ensure 100% uptime
+    res.json(curriculum);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Subject Fetch Static Error:', error);
+    res.status(500).json({ message: 'Failed to load courses' });
   }
 };
 

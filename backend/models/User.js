@@ -26,6 +26,15 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    // Enhanced Profile Fields
+    phone: { type: String, default: '' },
+    section: { type: String, default: '' },
+    year: { type: String, default: '' },
+    department: { type: String, default: '' },
+    bio: { type: String, default: '' },
+    github: { type: String, default: '' },
+    linkedIn: { type: String, default: '' },
+    profilePic: { type: String, default: '' },
   },
   {
     timestamps: true,

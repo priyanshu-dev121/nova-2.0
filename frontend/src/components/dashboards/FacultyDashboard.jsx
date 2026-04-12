@@ -112,23 +112,26 @@ const FacultyDashboard = ({ user }) => {
   };
 
   const handleUploadNote = async () => {
-    if (!noteData.title || noteData.subject === 'Select Subject') {
-      showToast('Please fill in title and subject', 'error');
+    if (!noteData.title || noteData.subject === 'Select Subject' || !fileInputRef.current.files[0]) {
+      showToast('Please fill all fields and select a file', 'error');
       return;
     }
     
-    // Simulating a more realistic URL for the mock environment
-    const submissionData = {
-      ...noteData,
-      fileUrl: `https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf?filename=${encodeURIComponent(noteData.fileName || 'document.pdf')}`
-    };
+    const formData = new FormData();
+    formData.append('title', noteData.title);
+    formData.append('subject', noteData.subject);
+    formData.append('file', fileInputRef.current.files[0]);
+    formData.append('isOfficial', 'true');
 
     try {
       setNoteLoading(true);
-      await API.post('/notes', submissionData);
-      showToast('Study material published to students!', 'success');
-      fetchStats(); // REFRESH NOTES COUNT
+      await API.post('/notes', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      showToast('Curriculum material published to Academic Vault!', 'success');
+      fetchStats(); 
       setNoteData({ title: '', subject: 'Select Subject', fileUrl: 'dummy_url', fileName: '' });
+      if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (err) {
       showToast('Publication failed', 'error');
     } finally {
@@ -155,8 +158,12 @@ const FacultyDashboard = ({ user }) => {
             </p>
           </div>
           <div className="user-profile">
-            <div className="profile-avatar">
-              {user.name.charAt(0)}
+            <div className="profile-avatar overflow-hidden">
+              {user.profilePic ? (
+                <img src={user.profilePic} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                user.name.charAt(0)
+              )}
             </div>
             <div className="profile-info">
               <span className="profile-rank">Faculty</span>

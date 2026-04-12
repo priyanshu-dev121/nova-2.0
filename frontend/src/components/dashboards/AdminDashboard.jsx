@@ -87,11 +87,15 @@ const AdminDashboard = ({ user }) => {
           <p className="font-bold opacity-60">Global management and system-wide analytics.</p>
         </div>
         <div className="top-actions">
-          <div className="user-profile">
-            <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-black">
-              A
+          <div className="user-profile cursor-pointer" onClick={() => navigate('/profile')}>
+            <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-black overflow-hidden shadow-lg shadow-indigo-600/20">
+              {user.profilePic ? (
+                <img src={user.profilePic} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                user.name?.charAt(0) || 'A'
+              )}
             </div>
-            <span className="font-bold text-sm">PR-ADMIN-01</span>
+            <span className="font-bold text-sm tracking-wide">{user.name || 'SYSTEM_ADMIN'}</span>
           </div>
         </div>
       </header>

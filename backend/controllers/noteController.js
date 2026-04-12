@@ -3,12 +3,18 @@ const Note = require('../models/Note');
 // Create a note
 const createNote = async (req, res) => {
   try {
-    const { title, subject, fileUrl } = req.body;
+    const { title, subject, isOfficial } = req.body;
+    
+    if (!req.file) {
+      return res.status(400).json({ message: 'Please upload a resource file' });
+    }
+
     const note = await Note.create({
       title,
       subject,
-      fileUrl,
-      faculty: req.user._id
+      fileUrl: req.file.path, // req.file.path contains the Cloudinary URL from multer-storage-cloudinary
+      faculty: req.user._id,
+      isOfficial: isOfficial === 'true' || isOfficial === true // Support both string (form-data) and boolean
     });
     res.status(201).json(note);
   } catch (error) {

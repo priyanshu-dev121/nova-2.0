@@ -12,7 +12,13 @@ import {
   Scan,
   MessageSquare,
   ClipboardList,
-  Sparkles
+  Sparkles,
+  Megaphone,
+  X,
+  Radar,
+  Rocket,
+  Search,
+  Zap
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import API from '../../api/axiosConfig';
@@ -54,6 +60,23 @@ const StudentDashboard = ({ user }) => {
     }
   };
 
+  const handleDismissNotice = async (id) => {
+    try {
+      await API.put(`/notices/${id}/dismiss`);
+      setNotices(prev => prev.filter(n => n._id !== id));
+    } catch (err) {
+      console.error('Error dismissing notice:', err);
+    }
+  };
+
+  const getNoticeIcon = (title, content) => {
+    const text = (title + ' ' + content).toLowerCase();
+    if (text.includes('attendance') || text.includes('live')) return <Radar className="text-rose-500 animate-pulse" size={18} />;
+    if (text.includes('holiday') || text.includes('cancel')) return <Calendar className="text-amber-500" size={18} />;
+    if (text.includes('exam') || text.includes('test')) return <ClipboardList className="text-indigo-500" size={18} />;
+    return <Megaphone className="text-indigo-500" size={18} />;
+  };
+
 
 
 
@@ -75,24 +98,33 @@ const StudentDashboard = ({ user }) => {
           <p className="font-bold opacity-60">Your smart campus ecosystem is live.</p>
         </div>
         <div className="top-actions">
-          <button className="relative p-2 text-black hover:text-indigo-600 transition-colors">
-            <Bell size={24} />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-indigo-500 rounded-full"></span>
-          </button>
-          <div className="user-profile">
-            <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-black">
-              {user.name.charAt(0)}
+          <div 
+            className="user-profile interactive cursor-pointer hover:scale-105 transition-transform" 
+            onClick={() => navigate('/profile')}
+          >
+            <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-black shadow-lg shadow-indigo-500/20 overflow-hidden">
+              {user.profilePic ? (
+                <img src={user.profilePic} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                user.name.charAt(0)
+              )}
             </div>
-            <span className="font-bold text-sm">PR07</span>
+            <span className="font-bold text-sm tracking-wide">PR07</span>
           </div>
         </div>
       </header>
 
       {/* Stats Grid */}
       <div className="stats-grid">
-        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }} className="stat-card">
+        <motion.div 
+          initial={{ y: 20, opacity: 0 }} 
+          animate={{ y: 0, opacity: 1 }} 
+          transition={{ delay: 0.1 }} 
+          className="stat-card cursor-pointer group"
+          onClick={() => navigate('/attendance')}
+        >
           <div className="stat-icon" style={{ color: '#3b82f6' }}>
-            <TrendingUp size={28} />
+            <TrendingUp size={28} className="group-hover:scale-110 transition-transform" />
           </div>
           <div className="stat-info">
             <h3>Attendance</h3>
@@ -100,9 +132,15 @@ const StudentDashboard = ({ user }) => {
           </div>
         </motion.div>
         
-        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="stat-card">
+        <motion.div 
+          initial={{ y: 20, opacity: 0 }} 
+          animate={{ y: 0, opacity: 1 }} 
+          transition={{ delay: 0.2 }} 
+          className="stat-card cursor-pointer group"
+          onClick={() => navigate('/complaints')}
+        >
           <div className="stat-icon" style={{ color: '#f43f5e' }}>
-            <AlertCircle size={28} />
+            <AlertCircle size={28} className="group-hover:scale-110 transition-transform" />
           </div>
           <div className="stat-info">
             <h3>Active Issues</h3>
@@ -110,9 +148,15 @@ const StudentDashboard = ({ user }) => {
           </div>
         </motion.div>
 
-        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }} className="stat-card">
+        <motion.div 
+          initial={{ y: 20, opacity: 0 }} 
+          animate={{ y: 0, opacity: 1 }} 
+          transition={{ delay: 0.3 }} 
+          className="stat-card cursor-pointer group"
+          onClick={() => navigate('/notes')}
+        >
           <div className="stat-icon" style={{ color: '#22c55e' }}>
-            <FileText size={28} />
+            <FileText size={28} className="group-hover:scale-110 transition-transform" />
           </div>
           <div className="stat-info">
             <h3>Study Material</h3>
@@ -131,22 +175,46 @@ const StudentDashboard = ({ user }) => {
           >
             <div className="card-header">
               <h2 className="flex items-center gap-3">
-                <Bell size={22} className="text-indigo-500" /> 
                 Campus Notices
               </h2>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {notices.length === 0 ? (
-                <div className="text-center py-6 opacity-40 font-bold">No new notices for you.</div>
+                <div className="text-center py-8 opacity-40 font-black uppercase text-xs tracking-widest bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+                  Mission Clear: No new notices
+                </div>
               ) : (
                 notices.map((notice) => (
-                  <div key={notice._id} className="p-4 bg-slate-50 rounded-xl border border-slate-100 hover:bg-white hover:border-indigo-100 transition-all">
-                    <p className="font-bold text-sm mb-1 text-slate-800">{notice.title}</p>
-                    <p className="text-xs font-medium text-slate-500">{notice.content}</p>
-                    <div className="flex justify-between items-center mt-3 pt-3 border-t border-slate-200/50">
-                       <span className="text-[10px] font-bold text-slate-300 uppercase">{new Date(notice.createdAt).toLocaleDateString()}</span>
-                       <span className="text-[10px] font-bold text-indigo-500 uppercase">{notice.author?.name}</span>
+                  <div key={notice._id} className="notice-row group relative overflow-hidden">
+                    <div className="notice-date">
+                       <span>{new Date(notice.createdAt).getDate()}</span>
+                       <small>{new Date(notice.createdAt).toLocaleString('default', { month: 'short' })}</small>
                     </div>
+                    
+                    <div className="flex-1 min-w-0">
+                       <div className="flex items-center gap-2 mb-1">
+                          {getNoticeIcon(notice.title, notice.content)}
+                          <h4 className="notice-title truncate">{notice.title || 'Campus Update'}</h4>
+                       </div>
+                       <p className="notice-content line-clamp-2">{notice.content}</p>
+                       <div className="flex items-center gap-2 mt-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-indigo-500/30"></span>
+                          <span className="notice-author italic">posted by {notice.author?.name || 'ADMIN'}</span>
+                       </div>
+                    </div>
+
+                    <button 
+                      onClick={() => handleDismissNotice(notice._id)}
+                      className="notice-delete-btn group-hover:opacity-100"
+                      title="Clear Notice"
+                    >
+                      <X size={16} />
+                    </button>
+
+                    {/* Content type glow indicator */}
+                    {(notice.title?.toLowerCase().includes('attendance') || notice.title?.toLowerCase().includes('live')) && (
+                       <div className="absolute top-0 right-0 w-1 h-full bg-rose-500/50" />
+                    )}
                   </div>
                 ))
               )}
@@ -171,42 +239,67 @@ const StudentDashboard = ({ user }) => {
 
         <div className="quick-actions-card col-span-1">
           <div className="card h-full">
-            <h3 className="font-black text-xl mb-8 tracking-tight uppercase">Quick Actions</h3>
-            <div className="actions-list">
+            <div className="section-header-aura-centered">
+               <h3>
+                 <Rocket className="text-indigo-500" size={26} />
+                 Quick Actions
+               </h3>
+            </div>
+
+            <div className="actions-list space-y-4">
               <button 
-                className="action-btn-p"
-                onClick={() => {
-                  console.log('Navigating to Attendance');
-                  navigate('/attendance');
-                }}
+                className="action-btn-aura"
+                onClick={() => navigate('/attendance')}
               >
-                <Scan size={24} /> 
-                <div>
-                  <p className="font-black">Mark Attendance</p>
-                  <p className="text-xs font-bold opacity-70">QR Scanner</p>
+                <Scan size={26} /> 
+                <div className="action-text-wrapper">
+                  <span className="action-main-text">Mark Attendance</span>
+                  <span className="action-sub-text">Digital QR Scanner</span>
                 </div>
               </button>
               
               <button 
-                className="action-btn"
-                onClick={() => {
-                  console.log('Navigating to Complaints');
-                  navigate('/complaints');
-                }}
+                className="action-btn-aura"
+                onClick={() => navigate('/complaints')}
               >
-                <MessageSquare size={22} /> 
-                <span className="font-bold">Raise Complaint</span>
+                <MessageSquare size={24} /> 
+                <div className="action-text-wrapper">
+                  <span className="action-main-text">Raise Complaint</span>
+                  <span className="action-sub-text">Support Ticket Desk</span>
+                </div>
               </button>
               
               <button 
-                className="action-btn"
-                onClick={() => {
-                  console.log('Navigating to Notes');
-                  navigate('/notes');
-                }}
+                className="action-btn-aura"
+                onClick={() => navigate('/notes')}
               >
-                <Upload size={22} /> 
-                <span className="font-bold">Share Notes</span>
+                <Upload size={24} /> 
+                <div className="action-text-wrapper">
+                  <span className="action-main-text">Share Notes</span>
+                  <span className="action-sub-text">Academic Vault</span>
+                </div>
+              </button>
+
+              <button 
+                className="action-btn-aura"
+                onClick={() => navigate('/lost-found')}
+              >
+                <Search size={24} /> 
+                <div className="action-text-wrapper">
+                  <span className="action-main-text">Lost & Found</span>
+                  <span className="action-sub-text">Campus Item Registry</span>
+                </div>
+              </button>
+
+              <button 
+                className="action-btn-aura"
+                onClick={() => navigate('/events')}
+              >
+                <Zap size={24} /> 
+                <div className="action-text-wrapper">
+                  <span className="action-main-text">Campus Events</span>
+                  <span className="action-sub-text">Live Activities Hub</span>
+                </div>
               </button>
             </div>
           </div>

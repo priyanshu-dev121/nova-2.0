@@ -31,10 +31,8 @@ const ResourceLibraryPage = () => {
   const fetchOfficialNotes = async () => {
     try {
       const { data } = await API.get('/notes');
-      // Filter only for notes uploaded by faculty/teachers
-      // Note: In a real system, we'd check note.faculty.role, 
-      // but for this implementation, we assume all results from /notes that have a faculty populated are official.
-      const officialMaterials = data.filter(note => note.faculty);
+      // Only show materials explicitly marked as official/verified by faculty
+      const officialMaterials = data.filter(note => note.isOfficial);
       setNotes(officialMaterials);
     } catch (err) {
       console.error('Error fetching official notes:', err);

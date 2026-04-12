@@ -6,23 +6,36 @@ const Event = require('../models/Event');
 const createEvent = async (req, res) => {
   try {
     const { title, description, eventDate } = req.body;
+    const mongoose = require('mongoose');
     
     let imageUrl = req.body.imageUrl || '';
     if (req.file) {
-      imageUrl = req.file.path; // Cloudinary returns the URL in path
+      imageUrl = req.file.path; 
     }
+
+    const finalDate = (eventDate && eventDate !== '') ? new Date(eventDate) : new Date();
+
+    // Ensure the ID is a valid Mongoose ObjectId for the DB
+    const createdById = mongoose.Types.ObjectId.isValid(req.user._id) 
+      ? new mongoose.Types.ObjectId(req.user._id) 
+      : req.user._id;
 
     const event = await Event.create({
       title,
       description,
-      eventDate: eventDate || new Date(), // Default to now if not provided
+      eventDate: finalDate,
       imageUrl,
-      createdBy: req.user._id
+      createdBy: createdById
     });
 
     res.status(201).json(event);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Critical Event Creation Error:', error);
+    res.status(500).json({ 
+      message: 'Failed to publish event', 
+      detail: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 };
 

@@ -13,7 +13,8 @@ import {
   X,
   LayoutDashboard,
   Sparkles,
-  Users
+  Users,
+  ShieldCheck
 } from 'lucide-react';
 
 import API from '../api/axiosConfig';
@@ -27,6 +28,7 @@ const AttendancePage = () => {
   const [user, setUser] = useState(null);
   const [history, setHistory] = useState([]);
   const [percentage, setPercentage] = useState(0);
+  const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [manualCode, setManualCode] = useState('');
@@ -52,6 +54,7 @@ const AttendancePage = () => {
       const { data } = await API.get('/attendance/user');
       setHistory(data.records || []);
       setPercentage(data.percentage || 0);
+      setSubjects(data.subjects || []);
     } catch (err) {
       console.error('Error fetching attendance:', err);
     }
@@ -145,15 +148,8 @@ const AttendancePage = () => {
   if (!user) return null;
   const status = getStatusInfo(percentage);
 
-  // Mock subjects for visual demonstration
-  const subjects = [
-    { name: 'Data Structures', code: 'CS102', attendance: 82, total: 24, attended: 20 },
-    { name: 'Software Engineering', code: 'CS301', attendance: 68, total: 18, attended: 12 },
-    { name: 'Computer Networks', code: 'CS204', attendance: 91, total: 22, attended: 20 },
-    { name: 'Theory of Computation', code: 'CS303', attendance: 64, total: 20, attended: 13 },
-  ];
-
-  const defaulters = subjects.filter(s => s.attendance < 75);
+  // Subjects are now dynamically loaded from the API
+  const defaulters = subjects.filter(s => s.percentage < 75);
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -222,32 +218,38 @@ const AttendancePage = () => {
               </div>
             )}
 
-            <section className="manual-entry-banner fade-up p-6 bg-white rounded-[2rem] border border-black/5 shadow-sm mb-8 flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center shrink-0">
-                  <Scan size={24} />
+            <section className="digital-terminal-container fade-up mb-12">
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-20 h-20 bg-indigo-50 text-indigo-600 rounded-[2rem] flex items-center justify-center shadow-inner mb-2">
+                  <Scan size={40} className="animate-pulse" />
                 </div>
                 <div>
-                  <h3 className="font-black text-slate-900">Manual Check-in</h3>
-                  <p className="text-xs font-bold text-slate-500">Enter the teacher's secret code below.</p>
+                  <h3 className="text-3xl font-black text-slate-900 tracking-tight">Manual Check-in</h3>
+                  <p className="text-sm font-bold text-slate-400 mt-1">Authorized secondary verification protocol.</p>
                 </div>
               </div>
               
-              <div className="flex items-center gap-2 w-full md:w-auto">
-                <input 
-                  type="text" 
-                  maxLength={4}
-                  placeholder="CODE"
-                  value={manualCode}
-                  onChange={(e) => setManualCode(e.target.value.replace(/\D/g, ''))}
-                  className="w-24 p-4 bg-slate-100 rounded-2xl border-none font-black text-lg text-center tracking-[0.2em] focus:ring-2 focus:ring-indigo-500 outline-none"
-                />
+              <div className="flex flex-col items-center gap-14 w-full mt-4">
+                <div className="relative group">
+                   <div className="absolute -inset-6 bg-indigo-500/5 rounded-[3rem] blur-2xl group-focus-within:bg-indigo-500/10 transition-all pointer-events-none z-0"></div>
+                   <input 
+                    type="text" 
+                    maxLength={4}
+                    placeholder="0 0 0 0"
+                    value={manualCode}
+                    onChange={(e) => setManualCode(e.target.value.replace(/\D/g, ''))}
+                    className="pin-input-aura relative z-10"
+                  />
+                </div>
+                
                 <button 
                   onClick={handleManualSubmit}
                   disabled={loading || manualCode.length !== 4}
-                  className="flex-1 md:flex-none py-4 px-8 bg-black text-white rounded-2xl font-black text-xs uppercase hover:bg-slate-800 transition-all disabled:opacity-30 active:scale-95"
+                  className="verify-submit-glow group relative flex items-center gap-3 overflow-hidden"
                 >
-                  {loading ? '...' : 'SUBMIT'}
+                   <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                   <span className="relative z-10">{loading ? 'Processing...' : 'Verify Identity'}</span>
+                   <ShieldCheck size={20} className="relative z-10 group-hover:rotate-12 transition-transform" />
                 </button>
               </div>
             </section>
@@ -302,45 +304,6 @@ const AttendancePage = () => {
                   </div>
                   <div className="stat-value">{history.length}</div>
                 </motion.div>
-                
-                <motion.div variants={itemVariants} initial="hidden" animate="visible" transition={{ delay: 0.1 }} className="stat-item shadow-sm border-2 border-indigo-100">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="stat-label uppercase tracking-widest text-[10px] font-black">Average Rank</span>
-                    <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center text-orange-600">
-                      <Sparkles size={16} />
-                    </div>
-                  </div>
-                  <div className="stat-value">A+</div>
-                </motion.div>
-                
-                <motion.div variants={itemVariants} initial="hidden" animate="visible" transition={{ delay: 0.2 }} className="stat-item shadow-sm">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="stat-label uppercase tracking-widest text-[10px] font-black">Upcoming Labs</span>
-                    <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
-                      <Clock size={16} />
-                    </div>
-                  </div>
-                  <div className="stat-value">02</div>
-                </motion.div>
-                
-                <motion.div variants={itemVariants} initial="hidden" animate="visible" transition={{ delay: 0.3 }} className="stat-item shadow-sm border-2 border-rose-100 bg-rose-50/20">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="stat-label uppercase tracking-widest text-[10px] font-black text-rose-600">Defaulter List</span>
-                    <div className="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center text-rose-600">
-                      <Users size={16} />
-                    </div>
-                  </div>
-                  <div className="stat-value text-rose-600">{defaulters.length > 0 ? defaulters.length : 'NONE'}</div>
-                  {defaulters.length > 0 && (
-                    <div className="mt-2 flex flex-col gap-1">
-                      {defaulters.map(d => (
-                        <div key={d.code} className="text-[9px] font-black text-rose-400 uppercase tracking-tighter">
-                          • {d.name}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </motion.div>
               </div>
             </div>
           <section className="subjects-section mb-12">
@@ -359,21 +322,21 @@ const AttendancePage = () => {
                       <h3>{sub.name}</h3>
                       <span className="subject-code">{sub.code}</span>
                     </div>
-                    <div className={`percentage-badge ${sub.attendance >= 75 ? 'safe' : 'critical'}`}>
-                      {sub.attendance}%
+                    <div className="subject-percentage">
+                      {sub.percentage}%
                     </div>
                   </div>
-                  <div className="mini-progress-bar">
-                    <motion.div 
-                      className="mini-progress-fill" 
-                      style={{ background: sub.attendance >= 75 ? 'var(--primary)' : '#ef4444' }}
-                      initial={{ width: 0 }}
-                      animate={{ width: `${sub.attendance}%` }}
-                      transition={{ duration: 1, delay: 0.5 }}
-                    />
+                  <div className="attendance-bar-container">
+                    <div className="attendance-bar">
+                      <motion.div 
+                        className={`bar-fill ${sub.percentage < 75 ? 'critical' : ''}`}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${sub.percentage}%` }}
+                      />
+                    </div>
                   </div>
-                  <div className="subject-footer">
-                    <span>Present: {sub.attended}</span>
+                  <div className="attendance-details">
+                    <span>Present: {sub.present}</span>
                     <span>Total: {sub.total}</span>
                   </div>
                 </motion.div>

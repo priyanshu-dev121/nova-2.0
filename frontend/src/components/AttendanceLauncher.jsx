@@ -9,17 +9,11 @@ const AttendanceLauncher = ({ user, onSuccess }) => {
   const [qrLoading, setQrLoading] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
   const [qrData, setQrData] = useState(null);
-  const [subjects] = useState([
-    { id: 1, code: 'NBS4201', name: 'Differential Equations and Fourier Analysis' },
-    { id: 2, code: 'NCS4201', name: 'Programming Concepts with Python' },
-    { id: 3, code: 'NEE4201', name: 'Basic Electrical Engineering' },
-    { id: 4, code: 'NBS4203', name: 'Engineering Chemistry' },
-    { id: 5, code: 'NCS4202', name: 'Basics of Artificial Intelligence' },
-    { id: 6, code: 'NHSCC1201', name: 'Communicative English' },
-    { id: 7, code: 'NCS4251', name: 'Python Programming Lab' },
-    { id: 8, code: 'NEE4251', name: 'Basic Electrical Engineering Lab' },
-    { id: 9, code: 'NBS4253', name: 'Engineering Chemistry Lab' }
-  ]);
+  const [subjects, setSubjects] = useState([]);
+  
+  useEffect(() => {
+    fetchSubjects();
+  }, []);
   const [selectedSubject, setSelectedSubject] = useState('Select Subject');
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
