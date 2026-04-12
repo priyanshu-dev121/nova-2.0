@@ -6,3 +6,9 @@ dist-ssr
 legacy-vue-app/
 client/
 server/
+
+# Environment Variables
+.env
+.env.*
+backend/.env
+frontend/.env
