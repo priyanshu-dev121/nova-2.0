@@ -24,10 +24,25 @@ const FacultyDashboard = ({ user }) => {
   const [noteLoading, setNoteLoading] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
   const [qrData, setQrData] = useState(null);
+  const [notices, setNotices] = useState([]);
   const [noticeData, setNoticeData] = useState({ title: '', content: '', target: 'Student' });
   const [noteData, setNoteData] = useState({ title: '', subject: 'Select Subject', fileUrl: 'dummy_url' });
   const fileInputRef = useRef(null);
   const { showToast } = useToast();
+
+  useEffect(() => {
+    fetchNotices();
+  }, []);
+
+  const fetchNotices = async () => {
+    try {
+      const { data } = await API.get('/notices');
+      setNotices(data);
+    } catch (err) {
+      console.error('Error fetching notices:', err);
+    }
+  };
+
 
   const handleGenerateQR = async () => {
     try {
@@ -272,23 +287,28 @@ const FacultyDashboard = ({ user }) => {
           <div className="card">
             <div className="card-header">
               <h2>
-                <Clock size={22} className="text-amber-500" /> 
-                Reminders
+                <Megaphone size={22} className="text-amber-500" /> 
+                Campus Notices
               </h2>
             </div>
             <div className="space-y-3">
-              {[
-                'Submit Grade Sheets - CS302',
-                'Faculty Meet @ 4:00 PM',
-                'Review Lab Equipment Report'
-              ].map((rem, i) => (
-                <div key={i} className="flex gap-4 items-center p-3 bg-black/5 rounded-xl hover:bg-white transition-all cursor-pointer">
-                  <div className="w-2 h-2 rounded-full bg-amber-500" />
-                  <span className="text-sm font-black opacity-80">{rem}</span>
-                </div>
-              ))}
+              {notices.length === 0 ? (
+                <div className="text-center py-6 opacity-40 font-bold text-xs uppercase">No active notices.</div>
+              ) : (
+                notices.map((notice) => (
+                  <div key={notice._id} className="p-4 bg-black/5 rounded-2xl border border-black/5 hover:bg-white transition-all">
+                    <p className="font-bold text-sm mb-1">{notice.title}</p>
+                    <p className="text-[11px] font-bold opacity-60 leading-relaxed">{notice.content}</p>
+                    <div className="flex justify-between items-center mt-3">
+                       <span className="text-[9px] font-black opacity-30 uppercase">{new Date(notice.createdAt).toLocaleDateString()}</span>
+                       <span className="text-[9px] font-black text-indigo-600 uppercase">{notice.author?.name}</span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
+
         </div>
       </div>
 

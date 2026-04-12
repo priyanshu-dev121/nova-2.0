@@ -26,6 +26,7 @@ const AdminDashboard = ({ user }) => {
   });
   const [recentComplaints, setRecentComplaints] = useState([]);
   const [noticeContent, setNoticeContent] = useState('');
+  const [broadcastTarget, setBroadcastTarget] = useState('All');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -54,12 +55,12 @@ const AdminDashboard = ({ user }) => {
     if (!noticeContent.trim()) return;
     try {
       await API.post('/notices', {
-        title: 'University-wide Notice',
+        title: 'System Announcement',
         content: noticeContent,
-        target: 'All'
+        target: broadcastTarget
       });
       setNoticeContent('');
-      alert('Broadcast successful! All users will receive this notice.');
+      alert(`Broadcast sent successfully to ${broadcastTarget === 'All' ? 'everyone' : broadcastTarget + 's'}.`);
     } catch (err) {
       console.error('Error broadcasting notice:', err);
       alert('Failed to broadcast notice.');
@@ -192,9 +193,24 @@ const AdminDashboard = ({ user }) => {
               </h2>
             </div>
             <div className="flex flex-col gap-4">
+              <div className="flex gap-2 mb-2 p-1 bg-black/5 rounded-xl">
+                {['All', 'Student', 'Faculty'].map(target => (
+                  <button
+                    key={target}
+                    onClick={() => setBroadcastTarget(target)}
+                    className={`flex-1 py-2 text-xs font-black rounded-lg transition-all ${
+                      broadcastTarget === target 
+                        ? 'bg-white text-indigo-600 shadow-sm' 
+                        : 'text-gray-400 hover:text-black'
+                    }`}
+                  >
+                    {target}
+                  </button>
+                ))}
+              </div>
               <div className="form-group mb-0">
                 <textarea 
-                  placeholder="Post an official notice for all students and faculty..." 
+                  placeholder={`Post a notice to ${broadcastTarget === 'All' ? 'everyone' : broadcastTarget + 's'}...`}
                   className="p-4 bg-black/5 border-none rounded-2xl text-sm h-32 resize-none font-bold text-black focus:bg-white transition-all outline-none"
                   value={noticeContent}
                   onChange={(e) => setNoticeContent(e.target.value)}
@@ -205,10 +221,11 @@ const AdminDashboard = ({ user }) => {
                 onClick={handleBroadcastNotice}
                 disabled={!noticeContent.trim()}
               >
-                <Send size={18} /> Broadcast Now
+                <Send size={18} /> Broadcast to {broadcastTarget}
               </button>
             </div>
           </div>
+
 
           <div className="card">
             <h3 className="font-black text-black mb-6 flex items-center gap-3">

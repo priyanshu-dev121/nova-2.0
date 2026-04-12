@@ -19,16 +19,23 @@ const createNotice = async (req, res) => {
 // Get all relative notices
 const getNotices = async (req, res) => {
   try {
-    // Show notices aimed at "All" or their specific role
-    const role = req.user.role === 'admin' ? 'Faculty' : req.user.role === 'faculty' ? 'Faculty' : 'Student';
-    const notices = await Notice.find({
-      target: { $in: ['All', role] }
-    }).sort({ createdAt: -1 }).populate('author', 'name');
+    let filter = {};
+    
+    // Non-admins see notices for "All" or their specific role
+    if (req.user.role !== 'admin') {
+      const userRole = req.user.role === 'faculty' ? 'Faculty' : 'Student';
+      filter = { target: { $in: ['All', userRole] } };
+    }
+
+    const notices = await Notice.find(filter)
+      .sort({ createdAt: -1 })
+      .populate('author', 'name');
     
     res.json(notices);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 module.exports = { createNotice, getNotices };

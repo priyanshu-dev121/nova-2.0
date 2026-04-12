@@ -24,6 +24,7 @@ const StudentDashboard = ({ user }) => {
     complaints: 0,
     notes: 0
   });
+  const [notices, setNotices] = useState([]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -31,10 +32,11 @@ const StudentDashboard = ({ user }) => {
 
   const fetchDashboardData = async () => {
     try {
-      const [attendanceRes, complaintsRes, notesRes] = await Promise.all([
+      const [attendanceRes, complaintsRes, notesRes, noticesRes] = await Promise.all([
         API.get('/attendance/user'),
         API.get('/complaints/user').catch(() => ({ data: [] })),
-        API.get('/notes').catch(() => ({ data: [] }))
+        API.get('/notes').catch(() => ({ data: [] })),
+        API.get('/notices').catch(() => ({ data: [] }))
       ]);
 
       setStats({
@@ -42,10 +44,12 @@ const StudentDashboard = ({ user }) => {
         complaints: complaintsRes.data.length || 0,
         notes: notesRes.data.length || 0
       });
+      setNotices(noticesRes.data);
     } catch (err) {
       console.error('Error fetching student dashboard data:', err);
     }
   };
+
 
   return (
     <div className="p-0 max-w-full">
@@ -120,15 +124,22 @@ const StudentDashboard = ({ user }) => {
               </h2>
             </div>
             <div className="space-y-4">
-              <div className="p-4 bg-black/5 rounded-2xl border border-black/5">
-                <p className="font-bold mb-1">Exam Schedule Updated</p>
-                <p className="text-sm font-bold opacity-60">Final exams will start from 20th May. Check timetable.</p>
-              </div>
-              <div className="p-4 bg-black/5 rounded-2xl border border-black/5">
-                <p className="font-bold mb-1">Holiday Notice</p>
-                <p className="text-sm font-bold opacity-60">Campus will be closed tomorrow for local festivities.</p>
-              </div>
+              {notices.length === 0 ? (
+                <div className="text-center py-6 opacity-40 font-bold">No new notices for you.</div>
+              ) : (
+                notices.map((notice) => (
+                  <div key={notice._id} className="p-4 bg-black/5 rounded-2xl border border-black/5 hover:bg-black/10 transition-all">
+                    <p className="font-bold mb-1">{notice.title}</p>
+                    <p className="text-sm font-bold opacity-60">{notice.content}</p>
+                    <div className="flex justify-between items-center mt-2">
+                       <span className="text-[10px] font-black opacity-30 uppercase">{new Date(notice.createdAt).toLocaleDateString()}</span>
+                       <span className="text-[10px] font-black text-indigo-600 uppercase">{notice.author?.name}</span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
+
           </div>
 
           <div className="card">
