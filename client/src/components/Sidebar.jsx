@@ -1,0 +1,58 @@
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+import { 
+  LayoutDashboard, 
+  CalendarCheck, 
+  ClipboardList, 
+  FileText, 
+  Search, 
+  Utensils, 
+  LogOut,
+  Sparkles
+} from 'lucide-react';
+
+const Sidebar = ({ handleLogout }) => {
+  const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+  const role = userInfo?.role || 'student';
+
+  const menuItems = [
+    { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
+    { name: 'Attendance', icon: <CalendarCheck size={20} />, path: '/attendance', roles: ['student', 'admin'] },
+    { name: 'Complaints', icon: <ClipboardList size={20} />, path: '/complaints' },
+    { name: 'Notes Sharing', icon: <FileText size={20} />, path: '/notes', roles: ['student', 'admin'] },
+    { name: 'Lost & Found', icon: <Search size={20} />, path: '/lostfound', roles: ['student', 'admin'] },
+  ];
+
+  const filteredItems = menuItems.filter(item => !item.roles || item.roles.includes(role));
+
+  return (
+    <aside className="sidebar">
+      <div className="sidebar-header logo">
+        <Sparkles className="text-primary" size={28} />
+        <h1 className="logo-text">Campus Nova</h1>
+      </div>
+      
+      <nav className="sidebar-nav">
+        {filteredItems.map((item) => (
+          <NavLink 
+            key={item.name} 
+            to={item.path} 
+            className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}
+          >
+            {item.icon}
+            <span>{item.name}</span>
+          </NavLink>
+        ))}
+      </nav>
+
+      <div className="sidebar-footer">
+        <button onClick={handleLogout} className="logout-btn">
+          <LogOut size={20} />
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+  );
+};
+
+export default Sidebar;
