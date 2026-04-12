@@ -1,23 +1,43 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Scan, X } from 'lucide-react';
+import { Scan, X, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import QRCode from "react-qr-code";
 import API from '../api/axiosConfig';
 import { useToast } from './Toast';
 
-const AttendanceLauncher = ({ user }) => {
+const AttendanceLauncher = ({ user, onSuccess }) => {
   const [qrLoading, setQrLoading] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
   const [qrData, setQrData] = useState(null);
-  const [subjects, setSubjects] = useState([]);
+  const [subjects] = useState([
+    { id: 1, code: 'NBS4201', name: 'Differential Equations and Fourier Analysis' },
+    { id: 2, code: 'NCS4201', name: 'Programming Concepts with Python' },
+    { id: 3, code: 'NEE4201', name: 'Basic Electrical Engineering' },
+    { id: 4, code: 'NBS4203', name: 'Engineering Chemistry' },
+    { id: 5, code: 'NCS4202', name: 'Basics of Artificial Intelligence' },
+    { id: 6, code: 'NHSCC1201', name: 'Communicative English' },
+    { id: 7, code: 'NCS4251', name: 'Python Programming Lab' },
+    { id: 8, code: 'NEE4251', name: 'Basic Electrical Engineering Lab' },
+    { id: 9, code: 'NBS4253', name: 'Engineering Chemistry Lab' }
+  ]);
   const [selectedSubject, setSelectedSubject] = useState('Select Subject');
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const [sessionStudents, setSessionStudents] = useState(0);
   const { showToast } = useToast();
   const pollingRef = useRef(null);
-
+ 
   useEffect(() => {
-    fetchSubjects();
-    return () => stopPolling();
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      stopPolling();
+    };
   }, []);
 
   const fetchSubjects = async () => {
@@ -64,6 +84,7 @@ const AttendanceLauncher = ({ user }) => {
       setQrData(data);
       setShowQRModal(true);
       showToast('Attendance session started!', 'success');
+      if (onSuccess) onSuccess(); // TRIGGER DASHBOARD REFRESH
       startPolling(data.sessionId);
     } catch (err) {
       console.error('QR Generation Error:', err);
@@ -102,26 +123,59 @@ const AttendanceLauncher = ({ user }) => {
           Attendance Launcher
         </h2>
       </div>
-      <div className="p-8 bg-black/5 rounded-[2rem] text-center border border-black/5 hover:bg-white transition-all shadow-sm">
-        <p className="font-bold text-slate-500 mb-6 uppercase text-[10px] tracking-widest">Select target subject</p>
+      <div className="p-10 bg-white/40 backdrop-blur-md rounded-[2.5rem] text-center border border-white/60 shadow-sm relative group">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-emerald-500 opacity-20" />
         
-        <select 
-          value={selectedSubject}
-          onChange={(e) => setSelectedSubject(e.target.value)}
-          className="w-full mb-6 p-4 bg-white/50 border border-black/5 rounded-2xl font-black text-sm text-center appearance-none cursor-pointer hover:border-indigo-200 transition-all outline-none"
-        >
-          <option disabled>Select Subject</option>
-          {subjects.map(sub => (
-            <option key={sub._id} value={sub.name}>{sub.name} ({sub.code})</option>
-          ))}
-        </select>
+        <label className="premium-label">Select target subject</label>
+        
+        <div className="custom-dropdown" ref={dropdownRef}>
+          <div 
+            className={`dropdown-trigger ${isOpen ? 'active' : ''}`}
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            <span className="selected-value">
+              {selectedSubject === 'Select Subject' ? 'Choose a course...' : selectedSubject}
+            </span>
+            <motion.div
+              animate={{ rotate: isOpen ? 180 : 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <ChevronDown size={20} className="text-indigo-500" />
+            </motion.div>
+          </div>
+
+          <AnimatePresence>
+            {isOpen && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                className="dropdown-menu"
+              >
+                {subjects.map(sub => (
+                  <div 
+                    key={sub.id} 
+                    className={`dropdown-item ${selectedSubject.includes(sub.code) ? 'selected' : ''}`}
+                    onClick={() => {
+                      setSelectedSubject(`${sub.name} (${sub.code})`);
+                      setIsOpen(false);
+                    }}
+                  >
+                    <span className="item-code">{sub.code}</span>
+                    <span className="item-name">{sub.name}</span>
+                  </div>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
         <button 
           onClick={handleGenerateQR}
           disabled={qrLoading}
-          className="action-btn-p mx-auto max-w-xs w-full py-4 rounded-2xl flex items-center justify-center gap-2"
+          className="action-btn-p mx-auto max-w-sm w-full py-5 rounded-2xl flex items-center justify-center gap-3 active:scale-95 transition-transform"
         >
-          <Scan size={20} /> {qrLoading ? 'Wait...' : 'GENERATE QR CODE'}
+          <Scan size={22} /> {qrLoading ? 'Wait...' : 'GENERATE QR CODE'}
         </button>
       </div>
 

@@ -90,7 +90,6 @@ const ResourceLibraryPage = () => {
 
           <div className="flex items-center gap-6">
             <div className="search-bar" style={{ minWidth: '400px' }}>
-              <Search size={20} className="search-icon" />
               <input 
                 type="text" 
                 placeholder="Search official resources..." 
@@ -98,6 +97,7 @@ const ResourceLibraryPage = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 style={{ fontSize: '1rem', fontWeight: 600 }}
               />
+              <Search size={20} className="search-icon" />
             </div>
           </div>
         </header>

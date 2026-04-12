@@ -120,13 +120,14 @@ const EventsPage = () => {
           </div>
 
           <div className="top-actions">
-            <div className="search-bar">
-              <Search className="search-icon" size={20} />
+            <div className="premium-search-container">
+              <Search className="premium-search-icon" size={22} />
               <input 
                 type="text" 
                 placeholder="Search events..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                className="premium-search-input"
               />
             </div>
             {isAdmin && (

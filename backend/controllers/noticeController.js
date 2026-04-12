@@ -31,8 +31,11 @@ const getNotices = async (req, res) => {
       filter = { 
         target: { 
           $in: ['All', targetRole] 
-        } 
+        },
+        dismissedBy: { $ne: req.user._id }
       };
+    } else {
+      filter = { dismissedBy: { $ne: req.user._id } };
     }
 
     const notices = await Notice.find(filter)
@@ -45,5 +48,45 @@ const getNotices = async (req, res) => {
   }
 };
 
-module.exports = { createNotice, getNotices };
+// Delete a notice
+const deleteNotice = async (req, res) => {
+  try {
+    const notice = await Notice.findById(req.params.id);
+
+    if (!notice) {
+      return res.status(404).json({ message: 'Notice not found' });
+    }
+
+    // Only author or admin can delete
+    if (notice.author.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Not authorized to delete this notice' });
+    }
+
+    await notice.deleteOne();
+    res.json({ message: 'Notice removed successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Dismiss a notice (per-user hidden)
+const dismissNotice = async (req, res) => {
+  try {
+    const notice = await Notice.findByIdAndUpdate(
+      req.params.id,
+      { $addToSet: { dismissedBy: req.user._id } },
+      { new: true }
+    );
+
+    if (!notice) {
+      return res.status(404).json({ message: 'Notice not found' });
+    }
+
+    res.json({ message: 'Notice dismissed' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { createNotice, getNotices, deleteNotice, dismissNotice };
 

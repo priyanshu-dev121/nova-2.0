@@ -98,7 +98,6 @@ const AdminUserManagementPage = () => {
 
           <div className="flex items-center gap-6">
             <div className="search-bar" style={{ minWidth: '400px' }}>
-              <Search size={20} className="search-icon" />
               <input 
                 type="text" 
                 placeholder={`Search ${roleFilter.toLowerCase()}s by name or email...`} 
@@ -106,6 +105,7 @@ const AdminUserManagementPage = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 style={{ fontSize: '1rem', fontWeight: 600 }}
               />
+              <Search size={20} className="search-icon" />
             </div>
           </div>
         </header>
@@ -180,10 +180,10 @@ const AdminUserManagementPage = () => {
                               whileTap={{ scale: 0.95 }}
                               onClick={() => handleDeleteUser(u._id)}
                               disabled={deletingId === u._id}
-                              className="px-8 py-4 bg-red-50 text-red-600 rounded-2xl text-[12px] font-black hover:bg-red-600 hover:text-white transition-all shadow-md flex items-center gap-3 active:scale-95"
+                              className="px-8 py-4 bg-rose-50/50 text-rose-600 rounded-2xl text-[11px] font-black border border-rose-200/50 hover:bg-rose-600 hover:text-white hover:border-rose-600 neon-purge-glow transition-all flex items-center gap-3 active:scale-95 group/btn"
                            >
-                              <Trash2 size={18} />
-                              {deletingId === u._id ? 'PURGING...' : 'PERMANENT DELETE'}
+                              <Trash2 size={16} className="group-hover/btn:rotate-12 transition-transform" />
+                              {deletingId === u._id ? 'DELETING...' : 'DELETE USER'}
                            </motion.button>
                         </div>
                      </div>

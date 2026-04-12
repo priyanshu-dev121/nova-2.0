@@ -15,6 +15,8 @@ import MessPage from './pages/MessPage';
 import AdminComplaintsPage from './pages/AdminComplaintsPage';
 import AdminUserManagementPage from './pages/AdminUserManagementPage';
 import EventsPage from './pages/EventsPage';
+import ClassLogsPage from './pages/ClassLogsPage';
+import MaterialLogsPage from './pages/MaterialLogsPage';
 
 function App() {
   return (
@@ -35,6 +37,8 @@ function App() {
           <Route path="/academic-vault" element={<AcademicVaultPage />} />
           <Route path="/lostfound" element={<LostFoundPage />} />
           <Route path="/mess" element={<MessPage />} />
+          <Route path="/class-logs" element={<ClassLogsPage />} />
+          <Route path="/material-logs" element={<MaterialLogsPage />} />
         </Routes>
       </Router>
     </ToastProvider>

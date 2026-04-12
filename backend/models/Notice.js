@@ -6,6 +6,7 @@ const noticeSchema = mongoose.Schema(
     content: { type: String, required: true },
     author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     target: { type: String, enum: ['All', 'Student', 'Faculty'], default: 'All' },
+    dismissedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   },
   { timestamps: true }
 );

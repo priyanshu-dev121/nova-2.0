@@ -123,13 +123,13 @@ const AdminComplaintsPage = () => {
 
           <div className="flex items-center gap-4">
              <div className="search-bar">
-                <Search size={18} className="search-icon" />
                 <input 
                   type="text" 
                   placeholder="Search by title or user..." 
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
+                <Search size={18} className="search-icon" />
              </div>
           </div>
         </header>

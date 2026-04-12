@@ -122,8 +122,13 @@ const StudentDashboard = ({ user }) => {
       </div>
 
       <div className="dashboard-grid">
-        <div className="space-y-6">
-          <div className="card">
+        <div className="space-y-6 col-span-2">
+          <motion.div 
+            initial={{ y: 30, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            className="card"
+          >
             <div className="card-header">
               <h2 className="flex items-center gap-3">
                 <Bell size={22} className="text-indigo-500" /> 
@@ -135,19 +140,18 @@ const StudentDashboard = ({ user }) => {
                 <div className="text-center py-6 opacity-40 font-bold">No new notices for you.</div>
               ) : (
                 notices.map((notice) => (
-                  <div key={notice._id} className="p-4 bg-black/5 rounded-2xl border border-black/5 hover:bg-black/10 transition-all">
-                    <p className="font-bold mb-1">{notice.title}</p>
-                    <p className="text-sm font-bold opacity-60">{notice.content}</p>
-                    <div className="flex justify-between items-center mt-2">
-                       <span className="text-[10px] font-black opacity-30 uppercase">{new Date(notice.createdAt).toLocaleDateString()}</span>
-                       <span className="text-[10px] font-black text-indigo-600 uppercase">{notice.author?.name}</span>
+                  <div key={notice._id} className="p-4 bg-slate-50 rounded-xl border border-slate-100 hover:bg-white hover:border-indigo-100 transition-all">
+                    <p className="font-bold text-sm mb-1 text-slate-800">{notice.title}</p>
+                    <p className="text-xs font-medium text-slate-500">{notice.content}</p>
+                    <div className="flex justify-between items-center mt-3 pt-3 border-t border-slate-200/50">
+                       <span className="text-[10px] font-bold text-slate-300 uppercase">{new Date(notice.createdAt).toLocaleDateString()}</span>
+                       <span className="text-[10px] font-bold text-indigo-500 uppercase">{notice.author?.name}</span>
                     </div>
                   </div>
                 ))
               )}
             </div>
-
-          </div>
+          </motion.div>
 
           <div className="card">
             <div className="card-header">
@@ -165,7 +169,7 @@ const StudentDashboard = ({ user }) => {
           </div>
         </div>
 
-        <div className="quick-actions-card">
+        <div className="quick-actions-card col-span-1">
           <div className="card h-full">
             <h3 className="font-black text-xl mb-8 tracking-tight uppercase">Quick Actions</h3>
             <div className="actions-list">

@@ -6,7 +6,9 @@ const {
   getUserAttendance, 
   getSubjects, 
   getSessionStatus,
-  getActiveSession
+  getActiveSession,
+  getFacultyStats,
+  getFacultyHistory
 } = require('../controllers/attendanceController');
 
 const { protect } = require('../middleware/authMiddleware');
@@ -17,6 +19,8 @@ router.get('/user', protect, getUserAttendance);
 router.get('/subjects', protect, getSubjects);
 router.get('/session/:id', protect, getSessionStatus);
 router.get('/active-session', protect, getActiveSession);
+router.get('/stats', protect, getFacultyStats);
+router.get('/history', protect, getFacultyHistory);
 
 module.exports = router;
 

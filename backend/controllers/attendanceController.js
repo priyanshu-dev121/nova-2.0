@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const Subject = require('../models/Subject'); 
 const Attendance = require('../models/Attendance');
 const Notice = require('../models/Notice');
+const Note = require('../models/Note');
 
 // Helper to calculate distance in meters (Haversine Formula)
 const getDistance = (lat1, lon1, lat2, lon2) => {
@@ -141,6 +142,51 @@ const getUserAttendance = async (req, res) => {
   }
 };
 
+// Faculty: Get overall stats for dashboard
+const getFacultyStats = async (req, res) => {
+  try {
+    const totalSessions = await AttendanceSession.countDocuments({ faculty: req.user._id });
+    const totalNotes = await Note.countDocuments({ faculty: req.user._id });
+    
+    // Calculate average attendance rate
+    const sessions = await AttendanceSession.find({ faculty: req.user._id });
+    let totalAttendance = 0;
+    sessions.forEach(s => {
+      totalAttendance += s.studentsMarked.length;
+    });
+    
+    const avgAttendance = totalSessions === 0 ? 0 : Math.round(totalAttendance / totalSessions);
+
+    res.json({
+      classesCount: totalSessions,
+      notesCount: totalNotes,
+      avgAttendance
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Faculty: Get detailed history of sessions
+const getFacultyHistory = async (req, res) => {
+  try {
+    const sessions = await AttendanceSession.find({ faculty: req.user._id })
+      .sort({ createdAt: -1 });
+    
+    const history = sessions.map(s => ({
+      id: s._id,
+      subject: s.subject,
+      count: s.studentsMarked.length,
+      date: s.createdAt,
+      otp: s.otp
+    }));
+
+    res.json(history);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Get subjects for the dropdown (with auto-seed for demo)
 const getSubjects = async (req, res) => {
   try {
@@ -196,6 +242,15 @@ const getActiveSession = async (req, res) => {
   }
 };
 
-module.exports = { startSession, markAttendance, getUserAttendance, getSubjects, getSessionStatus, getActiveSession };
+module.exports = { 
+  startSession, 
+  markAttendance, 
+  getUserAttendance, 
+  getSubjects, 
+  getSessionStatus, 
+  getActiveSession,
+  getFacultyStats,
+  getFacultyHistory
+};
 
 

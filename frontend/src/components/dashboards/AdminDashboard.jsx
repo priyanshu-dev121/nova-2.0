@@ -12,7 +12,8 @@ import {
   Sparkles,
   Bell,
   Send,
-  Activity
+  Activity,
+  ShieldAlert
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import API from '../../api/axiosConfig';
@@ -73,10 +74,6 @@ const AdminDashboard = ({ user }) => {
 
   return (
     <div className="p-0 max-w-full">
-      {/* Background Atmosphere */}
-      <div className="nebula-orb orb-1" />
-      <div className="nebula-orb orb-2" />
-
       <header className="top-bar">
         <div className="welcome-msg">
           <motion.h2 
@@ -154,41 +151,60 @@ const AdminDashboard = ({ user }) => {
       </div>
 
       <div className="dashboard-grid">
-        <div className="space-y-6">
-          <div className="card">
-            <div className="card-header">
-              <h2 className="flex items-center gap-3">
-                <ShieldCheck size={22} className="text-indigo-600" /> 
-                Recent System Incidents
-              </h2>
+        <div className="space-y-6 col-span-2">
+          <motion.div 
+            initial={{ y: 30, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            className="card"
+          >
+            <div className="card-header justify-between">
+              <h3 className="flex items-center gap-3">
+                <ShieldAlert size={22} className="text-rose-600 animate-pulse" /> Critical Incidents
+              </h3>
             </div>
-            <div className="space-y-3">
+            <div className="divide-y divide-slate-100">
               {recentComplaints.length === 0 ? (
-                <div className="text-center py-6 opacity-40 font-bold">No active incidents found.</div>
+                <div className="text-center py-12 opacity-40 font-bold text-xs uppercase tracking-widest">No active incidents found.</div>
               ) : (
                 recentComplaints.map((complaint) => (
-                  <div key={complaint._id} className="flex items-center justify-between p-4 bg-black/5 rounded-2xl hover:bg-black/10 transition-all cursor-pointer border border-black/5">
-                    <div>
-                      <p className="font-bold text-sm text-black">{complaint.title}</p>
-                      <p className="text-xs font-bold opacity-60">Posted by: {complaint.userId?.name || 'User'}</p>
+                  <div 
+                    key={complaint._id} 
+                    className="flex items-center justify-between p-5 hover:bg-slate-50/50 transition-all cursor-pointer group"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className={`p-2 rounded-lg ${
+                        complaint.status === 'Resolved' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
+                      }`}>
+                        <AlertCircle size={18} />
+                      </div>
+                      <div>
+                        <p className="font-extrabold text-sm text-slate-800 leading-tight mb-1">{complaint.title}</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+                          Reported by <span className="text-indigo-600">{complaint.userId?.name || 'Anonymous User'}</span>
+                        </p>
+                      </div>
                     </div>
-                    <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-md ${
-                      complaint.status === 'Resolved' ? 'bg-green-100 text-green-700' : 
-                      complaint.status === 'In Progress' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'
-                    }`}>
-                      {complaint.status}
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border ${
+                        complaint.status === 'Resolved' ? 'border-emerald-200 bg-emerald-50/50 text-emerald-700' : 
+                        complaint.status === 'In Progress' ? 'border-indigo-200 bg-indigo-50/50 text-indigo-700' : 'border-amber-200 bg-amber-50/50 text-amber-700'
+                      }`}>
+                        {complaint.status}
+                      </span>
+                      <ChevronRight size={16} className="text-slate-300 group-hover:text-indigo-600 transition-colors" />
+                    </div>
                   </div>
                 ))
               )}
             </div>
-            <button className="action-btn-p w-full mt-6" onClick={() => navigate('/admin/complaints')}>
+          </motion.div>
+          <button className="action-btn-p w-full mt-6" onClick={() => navigate('/admin/complaints')}>
               Manage Incident Logs
             </button>
-          </div>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-6 col-span-1">
           <div className="card">
             <div className="card-header">
               <h2 className="flex items-center gap-3">
@@ -196,16 +212,17 @@ const AdminDashboard = ({ user }) => {
                 Campus-wide Broadcast
               </h2>
             </div>
-            <div className="flex flex-col gap-4">
-              <div className="flex gap-2 mb-2 p-1 bg-black/5 rounded-xl">
+            <div className="flex flex-col gap-8">
+              <div className="flex flex-wrap items-center gap-8 p-0">
                 {['All', 'Student', 'Faculty'].map(target => (
                   <button
                     key={target}
                     onClick={() => setBroadcastTarget(target)}
-                    className={`flex-1 py-2 text-xs font-black rounded-lg transition-all ${
+                    style={{ fontSize: '1.5rem' }}
+                    className={`relative px-10 py-4 rounded-full font-black uppercase tracking-tight transition-all duration-300 ${
                       broadcastTarget === target 
-                        ? 'bg-white text-indigo-600 shadow-sm' 
-                        : 'text-gray-400 hover:text-black'
+                        ? 'target-active neon-pulse-animation scale-110'
+                        : 'text-slate-400 hover:text-slate-900 bg-transparent opacity-60'
                     }`}
                   >
                     {target}
@@ -227,33 +244,6 @@ const AdminDashboard = ({ user }) => {
               >
                 <Send size={18} /> Broadcast to {broadcastTarget}
               </button>
-            </div>
-          </div>
-
-
-          <div className="card">
-            <h3 className="font-black text-black mb-6 flex items-center gap-3">
-              <Activity size={22} className="text-indigo-600 animate-pulse" /> System Diagnostics
-            </h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between text-sm py-2 border-b border-black/5">
-                <span className="font-bold opacity-60">Core API Mesh</span>
-                <span className="text-green-600 font-black flex items-center gap-1">
-                  <CheckCircle size={14} /> Operational
-                </span>
-              </div>
-              <div className="flex items-center justify-between text-sm py-2 border-b border-black/5">
-                <span className="font-bold opacity-60">Database Cluster</span>
-                <span className="text-green-600 font-black flex items-center gap-1">
-                  <CheckCircle size={14} /> Stabilized
-                </span>
-              </div>
-              <div className="flex items-center justify-between text-sm py-2">
-                <span className="font-bold opacity-60">Telemetry Nodes</span>
-                <span className="text-blue-600 font-black flex items-center gap-1">
-                   Processing...
-                </span>
-              </div>
             </div>
           </div>
         </div>
