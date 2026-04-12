@@ -59,4 +59,30 @@ const markAttendance = async (req, res) => {
   }
 };
 
-module.exports = { startSession, markAttendance };
+// Student: Get their personal attendance stats
+const getUserAttendance = async (req, res) => {
+  try {
+    const totalSessions = await AttendanceSession.countDocuments({});
+    const attendedSessions = await AttendanceSession.countDocuments({
+      studentsMarked: req.user._id
+    });
+
+    const percentage = totalSessions === 0 ? 0 : Math.round((attendedSessions / totalSessions) * 100);
+
+    const records = await AttendanceSession.find({
+      studentsMarked: req.user._id
+    }).sort({ createdAt: -1 });
+
+    res.json({
+      percentage,
+      count: attendedSessions,
+      total: totalSessions,
+      records
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { startSession, markAttendance, getUserAttendance };
+

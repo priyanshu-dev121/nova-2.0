@@ -20,30 +20,21 @@ const createNotice = async (req, res) => {
 const getNotices = async (req, res) => {
   try {
     const { role } = req.user;
-    let filter = {};
-
-    // Admins see everything. Students and Faculty see "All" + their specific role.
-    if (role !== 'admin') {
-      // Normalize role to match the Notice model's capitalize enum ['All', 'Student', 'Faculty']
-      const targetRole = role.charAt(0).toUpperCase() + role.slice(1);
-      
-      filter = { 
-        target: { 
-          $in: ['All', targetRole] 
-        } 
-      };
-    }
-
-    const notices = await Notice.find(filter)
+    console.log('Fetching notices for role:', role);
+    
+    // TEMPORARILY REMOVE FILTER TO DEBUG
+    const notices = await Notice.find({})
       .sort({ createdAt: -1 })
       .populate('author', 'name');
     
+    console.log(`Found ${notices.length} notices total.`);
     res.json(notices);
   } catch (error) {
     console.error('Error fetching notices:', error);
     res.status(500).json({ message: error.message });
   }
 };
+
 
 
 
