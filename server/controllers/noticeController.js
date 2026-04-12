@@ -19,12 +19,19 @@ const createNotice = async (req, res) => {
 // Get all relative notices
 const getNotices = async (req, res) => {
   try {
+    const { role } = req.user;
     let filter = {};
-    
-    // Non-admins see notices for "All" or their specific role
-    if (req.user.role !== 'admin') {
-      const userRole = req.user.role === 'faculty' ? 'Faculty' : 'Student';
-      filter = { target: { $in: ['All', userRole] } };
+
+    // Admins see everything. Students and Faculty see "All" + their specific role.
+    if (role !== 'admin') {
+      // Normalize role to match the Notice model's capitalize enum ['All', 'Student', 'Faculty']
+      const targetRole = role.charAt(0).toUpperCase() + role.slice(1);
+      
+      filter = { 
+        target: { 
+          $in: ['All', targetRole] 
+        } 
+      };
     }
 
     const notices = await Notice.find(filter)
@@ -33,9 +40,11 @@ const getNotices = async (req, res) => {
     
     res.json(notices);
   } catch (error) {
+    console.error('Error fetching notices:', error);
     res.status(500).json({ message: error.message });
   }
 };
+
 
 
 module.exports = { createNotice, getNotices };
