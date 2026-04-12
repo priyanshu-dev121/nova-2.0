@@ -24,7 +24,10 @@ const app = express();
 connectDB();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: true, // Dynamically allow the origin of the request
+  credentials: true,
+}));
 app.use(express.json());
 
 // Apply Routes
@@ -66,8 +69,13 @@ app.use('/api/users', userRoutes);
 
 
 // Base Route
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
   res.send('Campus Nova API is running...');
+});
+
+// Health Check / Base Route
+app.get('/', (req, res) => {
+  res.send('Campus Nova API is live and healthy! 🛡️🛰️');
 });
 
 const PORT = process.env.PORT || 5050;
