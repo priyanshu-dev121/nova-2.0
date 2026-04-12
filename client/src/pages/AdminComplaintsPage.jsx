@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '../components/Toast';
 import { 
   ChevronLeft, 
   Search, 
   Filter, 
   AlertCircle, 
-  CheckCircle2, 
+  CheckCircle, 
   Clock, 
   MessageSquare,
   ShieldCheck,
@@ -27,6 +28,7 @@ const AdminComplaintsPage = () => {
   const [updating, setUpdating] = useState(false);
   
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   useEffect(() => {
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
@@ -82,10 +84,11 @@ const AdminComplaintsPage = () => {
       await API.patch(`/complaints/${id}`, { status, actionTaken: notes });
       setSelectedId(null);
       setResolutionNote('');
+      showToast(`Incident marked as ${status}`, 'success');
       fetchComplaints();
     } catch (err) {
       console.error('Error updating status:', err);
-      alert('Failed to update status.');
+      showToast('Failed to update status', 'error');
     } finally {
       setUpdating(false);
     }
@@ -187,7 +190,7 @@ const AdminComplaintsPage = () => {
                         c.status === 'Resolved' ? 'bg-green-600 text-white shadow-green-100' : 
                         c.status === 'In Progress' ? 'bg-blue-600 text-white shadow-blue-100' : 'bg-amber-500 text-white shadow-amber-100'
                       }`}>
-                        {c.status === 'Resolved' ? <CheckCircle2 size={40} /> : c.status === 'In Progress' ? <Clock size={40} /> : <AlertCircle size={40} />}
+                        {c.status === 'Resolved' ? <CheckCircle size={40} /> : c.status === 'In Progress' ? <Clock size={40} /> : <AlertCircle size={40} />}
                       </div>
                     </div>
 
@@ -303,7 +306,7 @@ const AdminComplaintsPage = () => {
                   {c.status === 'Resolved' && c.actionTaken && (
                     <div className="mt-8 p-6 bg-green-50/40 rounded-3xl border border-green-100/50">
                        <p className="text-[10px] font-black uppercase text-green-800/40 mb-2 flex items-center gap-2">
-                         <CheckCircle2 size={12} /> Official Resolution Log
+                         <CheckCircle size={12} /> Official Resolution Log
                        </p>
                        <p className="text-lg font-bold text-green-900/90 leading-relaxed italic">"{c.actionTaken}"</p>
                     </div>

@@ -24,8 +24,9 @@ const getNotices = async (req, res) => {
 
     // Admins see everything. Students and Faculty see "All" + their specific role.
     if (role !== 'admin') {
-      // Normalize role to match the Notice model's capitalize enum ['All', 'Student', 'Faculty']
-      const targetRole = role.charAt(0).toUpperCase() + role.slice(1);
+      // Robust normalization: trim and capitalize first letter
+      const normalizedRole = role.toLowerCase().trim();
+      const targetRole = normalizedRole.charAt(0).toUpperCase() + normalizedRole.slice(1);
       
       filter = { 
         target: { 

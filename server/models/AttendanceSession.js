@@ -8,6 +8,10 @@ const attendanceSessionSchema = mongoose.Schema(
     qrCode: { type: String, required: true }, // Unique string for QR
     expiresAt: { type: Date, required: true },
     isActive: { type: Boolean, default: true },
+    location: {
+      latitude: { type: Number },
+      longitude: { type: Number }
+    },
     studentsMarked: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
   },
   { timestamps: true }

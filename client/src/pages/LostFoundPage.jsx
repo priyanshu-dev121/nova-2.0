@@ -167,9 +167,9 @@ const LostFoundPage = () => {
                 <div className="item-details p-4">
                   <h3>{item.title}</h3>
                   <p className="description">{item.description}</p>
-                  <p className="poster">Posted by {item.userId.name}</p>
+                  <p className="poster">Posted by {item.userId?.name || 'Anonymous'}</p>
                   <div className="flex gap-2 mt-4">
-                    <a href={`mailto:${item.userId.email}`} className="btn-primary flex-1 justify-center">
+                    <a href={`mailto:${item.userId?.email || '#'}`} className="btn-primary flex-1 justify-center">
                       <Mail size={18} /> Email Finder
                     </a>
                   </div>

@@ -18,7 +18,6 @@ const complaintSchema = mongoose.Schema(
     category: {
       type: String,
       required: true,
-      enum: ['Hostel', 'WiFi', 'Mess', 'Other'],
     },
     status: {
       type: String,

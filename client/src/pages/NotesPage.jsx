@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileText, Upload, Search, ChevronLeft, Download, Filter, Trash2 } from 'lucide-react';
+import { useToast } from '../components/Toast';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from '../components/Sidebar';
@@ -17,6 +18,7 @@ const NotesPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   useEffect(() => {
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
@@ -25,6 +27,8 @@ const NotesPage = () => {
     } else {
       setUser(userInfo);
       fetchNotes();
+      const interval = setInterval(fetchNotes, 30000); // Poll for new notes every 30s
+      return () => clearInterval(interval);
     }
   }, [navigate]);
 
@@ -39,7 +43,7 @@ const NotesPage = () => {
 
   const handleUpload = async (e) => {
     e.preventDefault();
-    if (!file) return alert('Please select a file');
+    if (!file) return showToast('Please select a file', 'error');
     
     setLoading(true);
     const data = new FormData();
@@ -55,8 +59,10 @@ const NotesPage = () => {
       setFormData({ title: '', subject: '' });
       setFile(null);
       fetchNotes();
+      showToast('Note uploaded successfully', 'success');
     } catch (err) {
       console.error('Error uploading note:', err);
+      showToast('Failed to upload note', 'error');
     } finally {
       setLoading(false);
     }
@@ -71,10 +77,11 @@ const NotesPage = () => {
     if (!window.confirm('Are you sure you want to delete this resource forever?')) return;
     try {
       await API.delete(`/notes/${id}`);
+      showToast('Resource removed successfully', 'success');
       fetchNotes();
     } catch (err) {
       console.error('Error deleting note:', err);
-      alert('Failed to delete note.');
+      showToast('Failed to delete note', 'error');
     }
   };
 

@@ -9,6 +9,7 @@ import Dashboard from './pages/Dashboard';
 import AttendancePage from './pages/AttendancePage';
 import ComplaintsPage from './pages/ComplaintsPage';
 import NotesPage from './pages/NotesPage';
+import AcademicVaultPage from './pages/AcademicVaultPage';
 import LostFoundPage from './pages/LostFoundPage';
 import MessPage from './pages/MessPage';
 import AdminComplaintsPage from './pages/AdminComplaintsPage';
@@ -31,6 +32,7 @@ function App() {
           <Route path="/admin/users" element={<AdminUserManagementPage />} />
           <Route path="/events" element={<EventsPage />} />
           <Route path="/notes" element={<NotesPage />} />
+          <Route path="/academic-vault" element={<AcademicVaultPage />} />
           <Route path="/lostfound" element={<LostFoundPage />} />
           <Route path="/mess" element={<MessPage />} />
         </Routes>

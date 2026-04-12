@@ -28,6 +28,8 @@ const StudentDashboard = ({ user }) => {
 
   useEffect(() => {
     fetchDashboardData();
+    const interval = setInterval(fetchDashboardData, 10000); // Polling every 10 seconds for notices/stats
+    return () => clearInterval(interval);
   }, []);
 
   const fetchDashboardData = async () => {

@@ -1,32 +1,33 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Users, 
-  QrCode, 
+  Monitor, 
   FilePlus, 
   Megaphone, 
   Clock, 
-  CheckCircle2,
+  Check,
   X,
   Send,
   Sparkles,
   Upload,
-  ChevronRight
+  ChevronRight,
+  Scan,
+  Library
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import QRCode from "react-qr-code";
+
 import API from '../../api/axiosConfig';
 import { useToast } from '../Toast';
+import AttendanceLauncher from '../AttendanceLauncher';
 import './FacultyDashboard.css';
 
 const FacultyDashboard = ({ user }) => {
-  const [qrLoading, setQrLoading] = useState(false);
   const [noticeLoading, setNoticeLoading] = useState(false);
   const [noteLoading, setNoteLoading] = useState(false);
-  const [showQRModal, setShowQRModal] = useState(false);
-  const [qrData, setQrData] = useState(null);
   const [notices, setNotices] = useState([]);
   const [noticeData, setNoticeData] = useState({ title: '', content: '', target: 'Student' });
-  const [noteData, setNoteData] = useState({ title: '', subject: 'Select Subject', fileUrl: 'dummy_url' });
+  const [noteData, setNoteData] = useState({ title: '', subject: 'Select Subject', fileUrl: 'dummy_url', fileName: '' });
   const fileInputRef = useRef(null);
   const { showToast } = useToast();
 
@@ -43,25 +44,6 @@ const FacultyDashboard = ({ user }) => {
     }
   };
 
-
-  const handleGenerateQR = async () => {
-    try {
-      setQrLoading(true);
-      const { data } = await API.post('/attendance/start', { 
-        subject: 'General Class', 
-        durationMinutes: 10 
-      });
-      setQrData(data);
-      setShowQRModal(true);
-      showToast('Attendance session started!', 'success');
-    } catch (err) {
-      console.error('QR Generation Error:', err);
-      showToast(err.response?.data?.message || 'QR Generation failed!', 'error');
-    } finally {
-      setQrLoading(false);
-    }
-  };
-
   const handlePostNotice = async () => {
     if (!noticeData.title || !noticeData.content) {
       showToast('Please fill all fields', 'error');
@@ -72,6 +54,7 @@ const FacultyDashboard = ({ user }) => {
       await API.post('/notices', noticeData);
       showToast('Announcement broadcasted!', 'success');
       setNoticeData({ title: '', content: '', target: 'Student' });
+      fetchNotices();
     } catch (err) {
       showToast('Broadcast failed', 'error');
     } finally {
@@ -84,29 +67,23 @@ const FacultyDashboard = ({ user }) => {
       showToast('Please fill in title and subject', 'error');
       return;
     }
+    
+    // Simulating a more realistic URL for the mock environment
+    const submissionData = {
+      ...noteData,
+      fileUrl: `https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf?filename=${encodeURIComponent(noteData.fileName || 'document.pdf')}`
+    };
+
     try {
       setNoteLoading(true);
-      await API.post('/notes', noteData);
+      await API.post('/notes', submissionData);
       showToast('Study material published to students!', 'success');
-      setNoteData({ title: '', subject: 'Select Subject', fileUrl: 'dummy_url' });
+      setNoteData({ title: '', subject: 'Select Subject', fileUrl: 'dummy_url', fileName: '' });
     } catch (err) {
       showToast('Publication failed', 'error');
     } finally {
       setNoteLoading(false);
     }
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
-  };
-
-  const cardVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1 }
   };
 
   return (
@@ -137,7 +114,6 @@ const FacultyDashboard = ({ user }) => {
         </div>
       </header>
 
-      {/* Stats Section */}
       <div className="stats-grid">
         <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }} className="stat-card">
           <div className="stat-icon" style={{ color: '#4f46e5' }}>
@@ -161,7 +137,7 @@ const FacultyDashboard = ({ user }) => {
 
         <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }} className="stat-card">
           <div className="stat-icon" style={{ color: '#10b981' }}>
-            <CheckCircle2 size={28} />
+            <Check size={28} />
           </div>
           <div className="stat-info">
             <h3>Attendance Rate</h3>
@@ -172,24 +148,7 @@ const FacultyDashboard = ({ user }) => {
 
       <div className="dashboard-grid">
         <div className="space-y-6">
-          <div className="card">
-            <div className="card-header">
-              <h2>
-                <QrCode size={22} className="text-indigo-500" /> 
-                Attendance Launcher
-              </h2>
-            </div>
-            <div className="p-8 bg-black/5 rounded-[2rem] text-center border border-black/5 hover:bg-white transition-all shadow-sm">
-              <p className="font-bold text-slate-500 mb-6">Launch a dynamic QR session for student check-ins.</p>
-              <button 
-                onClick={handleGenerateQR}
-                disabled={qrLoading}
-                className="action-btn-p mx-auto max-w-xs"
-              >
-                <QrCode size={20} /> {qrLoading ? 'Wait...' : 'GENERATE QR CODE'}
-              </button>
-            </div>
-          </div>
+          <AttendanceLauncher user={user} />
 
           <div className="card">
             <div className="card-header">
@@ -227,8 +186,8 @@ const FacultyDashboard = ({ user }) => {
           <div className="card">
             <div className="card-header">
               <h2>
-                <FilePlus size={22} className="text-indigo-500" /> 
-                Resource Hub
+                <Library size={22} className="text-indigo-500" /> 
+                Academic Vault
               </h2>
             </div>
             <div className="space-y-4">
@@ -279,7 +238,7 @@ const FacultyDashboard = ({ user }) => {
                 disabled={noteLoading}
                 className="action-btn-p w-full"
               >
-                <CheckCircle2 size={20} /> {noteLoading ? 'WAITING...' : 'SUBMIT MATERIAL'}
+                <Check size={20} /> {noteLoading ? 'WAITING...' : 'SUBMIT MATERIAL'}
               </button>
             </div>
           </div>
@@ -311,57 +270,6 @@ const FacultyDashboard = ({ user }) => {
 
         </div>
       </div>
-
-      {/* High-End QR Modal */}
-      <AnimatePresence>
-        {showQRModal && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[9999] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-xl"
-            onClick={() => setShowQRModal(false)}
-          >
-            <motion.div 
-              initial={{ scale: 0.9, y: 20, opacity: 0 }}
-              animate={{ scale: 1, y: 0, opacity: 1 }}
-              exit={{ scale: 0.9, y: 20, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white p-10 rounded-[3rem] shadow-2xl max-w-md w-full relative border border-white/20"
-            >
-              <button 
-                onClick={() => setShowQRModal(false)}
-                className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-900 transition-colors"
-              >
-                <X size={28} />
-              </button>
-              
-              <div className="text-center mb-8">
-                <div className="w-20 h-20 bg-indigo-50 text-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-4 animate-pulse">
-                  <QrCode size={40} />
-                </div>
-                <h3 className="text-2xl font-black text-slate-900">Attendance QR</h3>
-                <p className="text-slate-500 text-sm font-bold">Valid for 10 minutes</p>
-              </div>
-
-              <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 flex items-center justify-center mb-8 shadow-inner shadow-slate-200/50">
-                <div className="p-4 bg-white rounded-3xl shadow-xl">
-                  <QRCode value={qrData?.qrValue || ''} size={200} />
-                </div>
-              </div>
-
-              <div className="text-center">
-                <div className="bg-amber-100 text-amber-700 px-4 py-2 rounded-full text-xs font-black inline-flex items-center gap-2 mb-4">
-                  <div className="w-2 h-2 rounded-full bg-amber-500 animate-ping" /> SCAN TO MARK PRESENT
-                </div>
-                <p className="text-xs text-slate-400 uppercase tracking-widest font-black">
-                  Expires: {qrData?.expiresAt ? new Date(qrData.expiresAt).toLocaleTimeString() : '--:--:--'}
-                </p>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };

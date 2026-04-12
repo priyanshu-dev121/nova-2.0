@@ -165,17 +165,128 @@
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  background: linear-gradient(135deg, var(--primary), #a855f7);
+  background: var(--primary);
   color: white;
-  padding: 0.65rem 1.25rem !important; /* Smaller padding */
-  border-radius: 0.65rem !important; /* Boxy corners */
-  font-weight: 700;
-  box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.2);
+  padding: 1rem 2rem !important; 
+  border-radius: 1.5rem !important; 
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
   transition: all 0.3s ease;
-  width: fit-content !important; /* Not 100% width */
+  width: fit-content;
 }
 
 .mark-attendance-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 20px 25px -5px rgba(79, 70, 229, 0.4);
+  box-shadow: 0 15px 30px -5px rgba(79, 70, 229, 0.5);
+  background: #000;
+}
+
+/* QR Scanner Custom Styles */
+#qr-reader {
+  border: none !important;
+  background: white !important;
+  padding: 0 !important;
+}
+
+#qr-reader div:first-child {
+  display: none; 
+}
+
+#qr-reader img {
+  display: none;
+}
+
+#qr-reader__scan_region {
+  background: #f8fafc !important;
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+#qr-reader__scan_region video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 1.5rem;
+}
+
+/* Custom Overlay Line */
+#qr-reader__scan_region::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: var(--primary);
+  box-shadow: 0 0 15px var(--primary);
+  z-index: 10;
+  animation: scanMove 2s infinite ease-in-out;
+}
+
+@keyframes scanMove {
+  0%, 100% { transform: translateY(-80px); opacity: 0.5; }
+  50% { transform: translateY(80px); opacity: 1; }
+}
+
+.manual-entry-banner {
+  animation: slideInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes slideInUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Radiant Shimmer Effect */
+.shimmer-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 70%,
+    transparent
+  );
+  transform: rotate(45deg);
+  animation: shimmer-swipe 3s infinite;
+}
+
+@keyframes shimmer-swipe {
+  0% { transform: translateX(-150%) rotate(45deg); }
+  100% { transform: translateX(150%) rotate(45deg); }
+}
+
+@keyframes gradient-slow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient-slow {
+  background-size: 200% 200%;
+  animation: gradient-slow 6s ease infinite;
+}
+
+.large-shimmer-btn {
+  font-size: 1rem !important;
+  padding: 1.5rem 2.5rem !important;
+  letter-spacing: 0.1em;
+  border-radius: 2rem !important;
 }

@@ -10,7 +10,8 @@ import {
   LogOut,
   Sparkles,
   ShieldCheck,
-  Users
+  Users,
+  Library
 } from 'lucide-react';
 
 const Sidebar = ({ handleLogout }) => {
@@ -24,6 +25,7 @@ const Sidebar = ({ handleLogout }) => {
     { name: 'User Management', icon: <Users size={20} />, path: '/admin/users', roles: ['admin'] },
     { name: 'Attendance', icon: <CalendarCheck size={20} />, path: '/attendance', roles: ['student', 'faculty'] },
     { name: 'Complaints', icon: <ClipboardList size={20} />, path: '/complaints', roles: ['student'] },
+    { name: 'Academic Vault', icon: <Library size={20} />, path: '/academic-vault', roles: ['student', 'admin'] },
     { name: 'Notes Sharing', icon: <FileText size={20} />, path: '/notes', roles: ['student', 'admin'] },
     { name: 'Lost & Found', icon: <Search size={20} />, path: '/lostfound', roles: ['student'] },
   ];

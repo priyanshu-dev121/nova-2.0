@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
+import { Check, AlertCircle, Info, X } from 'lucide-react';
 import './Toast.css';
 
 const ToastContext = createContext(null);
@@ -42,7 +42,7 @@ export const ToastProvider = ({ children }) => {
               className={`toast-item toast-${toast.type}`}
             >
               <div className="toast-icon">
-                {toast.type === 'success' && <CheckCircle2 size={20} />}
+                {toast.type === 'success' && <Check size={20} />}
                 {toast.type === 'error' && <AlertCircle size={20} />}
                 {toast.type === 'info' && <Info size={20} />}
               </div>
