@@ -2,72 +2,112 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../components/Toast';
 import Sidebar from '../components/Sidebar';
-import API from '../api/axiosConfig'; // Standardized API handler
-import { Search, Plus, ChevronLeft, Mail, MapPin, Camera, Upload } from 'lucide-react';
+import API from '../api/axiosConfig';
+import { 
+  Search, Plus, ChevronLeft, MapPin, 
+  Filter, Tag, Calendar, LayoutGrid, 
+  Map as MapIcon, ShieldCheck, Clock
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import LostFoundForm from '../components/LostFoundForm';
+import ClaimModal from '../components/ClaimModal';
+import ItemDetailsModal from '../components/ItemDetailsModal';
+import CampusMap from '../components/CampusMap';
 import './Dashboard.css';
+
+const CATEGORIES = ['All', 'Electronics', 'Stationery', 'Clothing', 'Wallet/Cards', 'Documents', 'Accessories', 'Others'];
 
 const LostFoundPage = () => {
   const [user, setUser] = useState(null);
   const [items, setItems] = useState([]);
+  const [filteredItems, setFilteredItems] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ title: '', description: '', contactInfo: '' });
-  const [file, setFile] = useState(null);
+  const [showClaimModal, setShowClaimModal] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
   const [loading, setLoading] = useState(false);
-  const { showToast } = useToast();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeType, setActiveType] = useState('all');
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [showMap, setShowMap] = useState(false);
   
+  const { showToast } = useToast();
   const navigate = useNavigate();
-
 
   useEffect(() => {
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-    if (!userInfo) {
-      navigate('/login');
-    } else {
+    if (!userInfo) navigate('/login');
+    else {
       setUser(userInfo);
       fetchItems();
     }
   }, [navigate]);
 
+  useEffect(() => {
+    filterItems();
+  }, [items, searchQuery, activeType, activeCategory]);
+
   const fetchItems = async () => {
     try {
+      setLoading(true);
       const { data } = await API.get('/lostfound');
       setItems(data);
     } catch (err) {
-      console.error('Error fetching items:', err);
-    }
-  };
-
-  const handleUpload = async (e) => {
-    e.preventDefault();
-    if (!file) {
-      showToast('Evidence required. Please upload a photo of the item.', 'error');
-      return;
-    }
-
-    setLoading(true);
-    const data = new FormData();
-    data.append('title', formData.title);
-    data.append('description', formData.description);
-    data.append('contactInfo', formData.contactInfo);
-    data.append('image', file);
-
-    try {
-      await API.post('/lostfound', data, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      setShowForm(false);
-      setFormData({ title: '', description: '', contactInfo: '' });
-      setFile(null);
-      showToast('Item listed successfully! Help is on the way.', 'success');
-      fetchItems();
-    } catch (err) {
-      console.error('Error reporting item:', err);
-      showToast('Database synchronization failed. Please try again.', 'error');
+      showToast('System connectivity error', 'error');
     } finally {
       setLoading(false);
     }
   };
 
+  const filterItems = () => {
+    let result = [...items];
+    if (activeType !== 'all') result = result.filter(i => i.type === activeType);
+    if (activeCategory !== 'All') result = result.filter(i => i.category === activeCategory);
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(i => 
+        i.title.toLowerCase().includes(q) || 
+        i.description.toLowerCase().includes(q) ||
+        i.location.toLowerCase().includes(q)
+      );
+    }
+    setFilteredItems(result);
+  };
+
+  const handlePostItem = async (formData) => {
+    try {
+      setLoading(true);
+      await API.post('/lostfound', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setShowForm(false);
+      showToast('Listing synchronized with Campus Core', 'success');
+      fetchItems();
+    } catch (err) {
+      showToast('Validation or Upload Error', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClaimSubmit = async ({ itemId, message }) => {
+    try {
+      setLoading(true);
+      await API.post('/lostfound/claim', { itemId, message });
+      setShowClaimModal(false);
+      setShowDetailModal(false);
+      showToast('Claim request broadcasted to the finder', 'success');
+    } catch (err) {
+      showToast('Claim submission failed', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openDetails = (item) => {
+    setSelectedItem(item);
+    setShowDetailModal(true);
+  };
 
   if (!user) return null;
 
@@ -75,109 +115,134 @@ const LostFoundPage = () => {
     <div className="dashboard-layout">
       <Sidebar handleLogout={() => { localStorage.removeItem('userInfo'); navigate('/login'); }} />
       <main className="main-content">
-        <header className="page-header flex justify-between items-center mb-8">
+        <header className="page-header flex justify-between items-center mb-6">
           <div className="flex items-center gap-4">
             <button className="icon-btn" onClick={() => navigate('/dashboard')}><ChevronLeft /></button>
-            <h1 className="text-2xl font-bold">Lost & Found</h1>
+            <h1 className="text-2xl font-bold">Lost & Found Portal</h1>
           </div>
-          <button className="btn-primary" onClick={() => setShowForm(!showForm)}>
-            <Plus size={20} /> Report Item
-          </button>
+          <div className="flex gap-2">
+            <button className={`icon-btn ${showMap ? 'active' : ''}`} onClick={() => setShowMap(!showMap)}>
+              <MapIcon size={20} />
+            </button>
+            <button className="btn-primary" onClick={() => setShowForm(true)}>
+              <Plus size={20} /> Report Item
+            </button>
+          </div>
         </header>
 
-        {showForm && (
-          <div className="centered-action-module fade-up">
-            <div className="card">
-              <h2 className="premium-form-header">List an Item</h2>
-              <form onSubmit={handleUpload} className="mt-4 flex flex-col gap-6">
-                <div className="form-group">
-                  <label>Item Name</label>
-                  <input 
-                    type="text" 
-                    value={formData.title} 
-                    onChange={(e) => setFormData({...formData, title: e.target.value})}
-                    placeholder="e.g. Blue Water Bottle"
-                    required 
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Description & Location Found/Lost</label>
-                  <textarea 
-                    rows="3" 
-                    value={formData.description} 
-                    onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    placeholder="Where and when did you see/lose it?"
-                    required
-                  ></textarea>
-                </div>
-                <div className="form-group">
-                  <label>Alternate Contact (Optional)</label>
-                  <input 
-                    type="text" 
-                    value={formData.contactInfo} 
-                    onChange={(e) => setFormData({...formData, contactInfo: e.target.value})}
-                    placeholder="Phone number or WhatsApp"
-                  />
-                </div>
-                
-                <div className="form-group">
-                  <label>Item Image</label>
-                  <div className="relative">
-                    <input 
-                      type="file" 
-                      id="item-image-upload"
-                      className="hidden"
-                      onChange={(e) => setFile(e.target.files[0])} 
-                      required 
-                    />
-                    <label htmlFor="item-image-upload" className="file-upload-hub">
-                      <div className="upload-icon-wrapper">
-                        <Camera size={32} />
-                      </div>
-                      <div>
-                        <p className="upload-text-main">
-                          {file ? file.name : "Click to take or upload item photo"}
-                        </p>
-                        <p className="upload-text-sub">Help others identify the item more easily</p>
-                      </div>
-                    </label>
-                  </div>
-                </div>
+        {showMap && <CampusMap />}
 
-                <div className="flex gap-4">
-                  <button type="submit" className="btn-primary" disabled={loading}>
-                    {loading ? 'Posting...' : 'Post Item'}
-                  </button>
-                  <button type="button" className="btn-secondary" onClick={() => setShowForm(false)}>Cancel</button>
-                </div>
-              </form>
+        <div className="lost-found-controls mb-8">
+          <div className="search-bar-wrapper">
+            <Search className="search-icon" size={20} />
+            <input 
+              type="text" 
+              placeholder="Search by name, location, or description..."
+              className="premium-search-input"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          
+          <div className="filter-scroll-wrapper">
+            <div className="type-filters">
+              {['all', 'lost', 'found'].map(t => (
+                <button 
+                  key={t}
+                  className={`filter-chip ${activeType === t ? 'active' : ''}`}
+                  onClick={() => setActiveType(t)}
+                >
+                  {t.charAt(0).toUpperCase() + t.slice(1)}
+                </button>
+              ))}
+            </div>
+            <div className="divider"></div>
+            <div className="category-filters">
+              {CATEGORIES.map(c => (
+                <button 
+                  key={c}
+                  className={`filter-chip ${activeCategory === c ? 'active' : ''}`}
+                  onClick={() => setActiveCategory(c)}
+                >
+                  {c}
+                </button>
+              ))}
             </div>
           </div>
-        )}
+        </div>
 
-        <div className="items-grid">
-          {items.length === 0 ? (
-            <p className="empty-state">No items listed yet.</p>
+        <div className="items-grid-v2">
+          {loading ? (
+            <div className="flex-center py-20"><div className="nova-spinner"></div></div>
+          ) : filteredItems.length === 0 ? (
+            <div className="empty-state-v2">
+              <Search size={48} />
+              <h3>No items found</h3>
+              <p>Try adjusting your filters or search keywords</p>
+            </div>
           ) : (
-            items.map((item) => (
-              <div key={item._id} className="item-card fade-up">
-                <div className="item-image">
-                  <img src={item.imageUrl} alt={item.title} />
-                </div>
-                <div className="item-details p-4">
-                  <h3>{item.title}</h3>
-                  <p className="description">{item.description}</p>
-                  <p className="poster">Posted by {item.userId?.name || 'Anonymous'}</p>
-                  <div className="flex gap-2 mt-4">
-                    <a href={`mailto:${item.userId?.email || '#'}`} className="btn-primary flex-1 justify-center">
-                      <Mail size={18} /> Email Finder
-                    </a>
+            <AnimatePresence mode='popLayout'>
+              {filteredItems.map((item) => (
+                <motion.div 
+                  key={item._id} 
+                  className={`premium-item-card ${item.type}`}
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  onClick={() => openDetails(item)}
+                >
+                  <div className="card-badge">
+                    {item.type === 'lost' ? 'Lost' : 'Found'}
                   </div>
-                </div>
-              </div>
-            ))
+                  <div className="item-img-container">
+                    <img src={item.imageUrl} alt={item.title} />
+                    <div className="category-overlay">{item.category}</div>
+                  </div>
+                  <div className="card-body">
+                    <h3 className="item-title">{item.title}</h3>
+                    <div className="meta-info">
+                      <div className="info-item"><MapPin size={14} /> {item.location}</div>
+                      <div className="info-item"><Clock size={14} /> {new Date(item.date).toLocaleDateString()}</div>
+                    </div>
+                    <p className="item-desc">{item.description}</p>
+                    <div className="card-footer">
+                      <div className="user-tag">
+                        <div className="avatar-small">{item.userId?.name?.[0] || 'A'}</div>
+                        <span>{item.userId?.name || 'Anonymous'}</span>
+                      </div>
+                      <div className="view-details-hint font-bold text-indigo-500 text-sm">
+                        View Details →
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
           )}
         </div>
+
+        <LostFoundForm 
+          isOpen={showForm} 
+          onClose={() => setShowForm(false)} 
+          onSubmit={handlePostItem}
+          loading={loading}
+        />
+
+        <ItemDetailsModal
+          isOpen={showDetailModal}
+          onClose={() => setShowDetailModal(false)}
+          onClaim={() => { setShowClaimModal(true); }}
+          item={selectedItem}
+        />
+
+        <ClaimModal 
+          isOpen={showClaimModal} 
+          onClose={() => setShowClaimModal(false)}
+          onSubmit={handleClaimSubmit}
+          item={selectedItem || {}}
+          loading={loading}
+        />
       </main>
     </div>
   );

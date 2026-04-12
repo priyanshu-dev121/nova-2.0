@@ -18,6 +18,28 @@ const lostFoundSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    type: {
+      type: String,
+      enum: ['lost', 'found'],
+      required: true,
+    },
+    category: {
+      type: String,
+      required: true,
+    },
+    location: {
+      type: String,
+      required: true,
+    },
+    date: {
+      type: Date,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ['available', 'claimed', 'resolved'],
+      default: 'available',
+    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
