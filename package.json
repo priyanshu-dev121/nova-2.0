@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node backend/index.js",
     "build": "npm run install-backend && npm run build-frontend",
-    "install-backend": "cd backend && npm install",
-    "build-frontend": "cd frontend && npm install && npm run build"
+    "install-backend": "cd backend && npm install --legacy-peer-deps",
+    "build-frontend": "cd frontend && npm install --legacy-peer-deps && npm run build"
   },
   "author": "Campus Nova Team",
   "license": "ISC"
