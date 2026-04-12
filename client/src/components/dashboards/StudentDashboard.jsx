@@ -32,18 +32,14 @@ const StudentDashboard = ({ user }) => {
 
   const fetchDashboardData = async () => {
     try {
-      console.log('Fetching Student Dashboard data...');
       const [attendanceRes, complaintsRes, notesRes, noticesRes] = await Promise.all([
         API.get('/attendance/user').catch(() => ({ data: { percentage: 0 } })),
         API.get('/complaints/user').catch(() => ({ data: [] })),
         API.get('/notes').catch(() => ({ data: [] })),
         API.get('/notices').catch((err) => {
-          console.error('Notice Fetch Error:', err);
           return { data: [] };
         })
       ]);
-
-      console.log('Notices received from API:', noticesRes.data);
 
       setStats({
         attendance: attendanceRes.data.percentage || 0,
@@ -55,6 +51,7 @@ const StudentDashboard = ({ user }) => {
       console.error('Error fetching student dashboard data:', err);
     }
   };
+
 
 
 

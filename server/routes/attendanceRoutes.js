@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { startSession, markAttendance } = require('../controllers/attendanceController');
+const { startSession, markAttendance, getUserAttendance } = require('../controllers/attendanceController');
+
 const { protect } = require('../middleware/authMiddleware');
 
 router.post('/start', protect, startSession);
