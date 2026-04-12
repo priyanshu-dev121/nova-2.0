@@ -13,7 +13,16 @@ const protect = async (req, res, next) => {
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      req.user = await User.findById(decoded.id).select('-password');
+      if (decoded.id === 'admin_root') {
+        req.user = {
+          _id: 'admin_root',
+          name: 'System Admin',
+          email: process.env.ADMIN_EMAIL || 'admin@bbdu.ac.in',
+          role: 'admin'
+        };
+      } else {
+        req.user = await User.findById(decoded.id).select('-password');
+      }
 
       next();
     } catch (error) {
@@ -28,7 +37,7 @@ const protect = async (req, res, next) => {
 };
 
 const admin = (req, res, next) => {
-  if (req.user && req.user.role === 'admin') {
+  if (req.user && req.user.role && req.user.role.toLowerCase() === 'admin') {
     next();
   } else {
     res.status(401).json({ message: 'Not authorized as an admin' });

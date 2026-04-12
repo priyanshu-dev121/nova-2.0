@@ -54,6 +54,8 @@ const updateComplaintStatus = async (req, res) => {
     }
 
     complaint.status = req.body.status || complaint.status;
+    complaint.actionTaken = req.body.actionTaken !== undefined ? req.body.actionTaken : complaint.actionTaken;
+
     const updatedComplaint = await complaint.save();
     res.json(updatedComplaint);
   } catch (error) {

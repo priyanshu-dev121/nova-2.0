@@ -12,6 +12,8 @@ const noteRoutes = require('./routes/noteRoutes');
 const lostFoundRoutes = require('./routes/lostFoundRoutes');
 const messRoutes = require('./routes/messRoutes');
 const noticeRoutes = require('./routes/noticeRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const eventRoutes = require('./routes/eventRoutes');
 
 
 const app = express();
@@ -47,6 +49,12 @@ app.use('/api/mess', messRoutes);
 
 console.log('Registering Notice Routes at /api/notices');
 app.use('/api/notices', noticeRoutes);
+
+console.log('Registering Admin Routes at /api/admin');
+app.use('/api/admin', adminRoutes);
+
+console.log('Registering Event Routes at /api/events');
+app.use('/api/events', eventRoutes);
 
 
 // Base Route

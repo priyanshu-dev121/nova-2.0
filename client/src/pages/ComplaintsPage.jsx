@@ -130,9 +130,16 @@ const ComplaintsPage = () => {
                       <h3 className="font-semibold">{c.title}</h3>
                       <p className="text-secondary text-sm">{c.category} • {new Date(c.createdAt).toLocaleDateString()}</p>
                     </div>
-                    <span className={`status-badge ${(c.status || '').toLowerCase().replace(' ', '-')}`}>
-                      {c.status}
-                    </span>
+                    <div className="flex flex-col items-end gap-2">
+                      <span className={`status-badge ${(c.status || '').toLowerCase().replace(' ', '-')}`}>
+                        {c.status}
+                      </span>
+                      {c.status === 'Resolved' && c.actionTaken && (
+                        <p className="text-[10px] font-black text-green-600 bg-green-50 px-2 py-1 rounded-md italic">
+                          Action: {c.actionTaken}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>

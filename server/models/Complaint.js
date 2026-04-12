@@ -26,6 +26,10 @@ const complaintSchema = mongoose.Schema(
       enum: ['Pending', 'In Progress', 'Resolved'],
       default: 'Pending',
     },
+    actionTaken: {
+      type: String,
+      default: '',
+    },
   },
   {
     timestamps: true,

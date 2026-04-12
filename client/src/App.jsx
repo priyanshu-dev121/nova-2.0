@@ -11,6 +11,9 @@ import ComplaintsPage from './pages/ComplaintsPage';
 import NotesPage from './pages/NotesPage';
 import LostFoundPage from './pages/LostFoundPage';
 import MessPage from './pages/MessPage';
+import AdminComplaintsPage from './pages/AdminComplaintsPage';
+import AdminUserManagementPage from './pages/AdminUserManagementPage';
+import EventsPage from './pages/EventsPage';
 
 function App() {
   return (
@@ -24,6 +27,9 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/attendance" element={<AttendancePage />} />
           <Route path="/complaints" element={<ComplaintsPage />} />
+          <Route path="/admin/complaints" element={<AdminComplaintsPage />} />
+          <Route path="/admin/users" element={<AdminUserManagementPage />} />
+          <Route path="/events" element={<EventsPage />} />
           <Route path="/notes" element={<NotesPage />} />
           <Route path="/lostfound" element={<LostFoundPage />} />
           <Route path="/mess" element={<MessPage />} />

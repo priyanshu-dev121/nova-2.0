@@ -1,7 +1,16 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, useMotionValue, useSpring } from "framer-motion";
-import { MapPin, Mail, Phone, Globe, MessageCircle, Video, Briefcase, Sparkles } from "lucide-react";
+import { 
+  MapPin, 
+  Mail, 
+  Phone, 
+  Globe, 
+  MessageCircle, 
+  Video, 
+  Briefcase, 
+  Sparkles 
+} from "lucide-react";
 import './Footer.css';
 
 const footerLinks = {

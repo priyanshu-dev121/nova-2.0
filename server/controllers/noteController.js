@@ -26,4 +26,21 @@ const getNotes = async (req, res) => {
   }
 };
 
-module.exports = { createNote, getNotes };
+// Delete a note
+const deleteNote = async (req, res) => {
+  try {
+    const note = await Note.findById(req.params.id);
+    if (!note) {
+      return res.status(404).json({ message: 'Note not found' });
+    }
+    
+    // In a real app, you might also delete the file from cloud storage (S3/Cloudinary)
+    // For now, we delete the database entry
+    await Note.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Note removed successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { createNote, getNotes, deleteNote };

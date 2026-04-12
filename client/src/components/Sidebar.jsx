@@ -8,7 +8,9 @@ import {
   Search, 
   Utensils, 
   LogOut,
-  Sparkles
+  Sparkles,
+  ShieldCheck,
+  Users
 } from 'lucide-react';
 
 const Sidebar = ({ handleLogout }) => {
@@ -17,11 +19,15 @@ const Sidebar = ({ handleLogout }) => {
 
   const menuItems = [
     { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
-    { name: 'Attendance', icon: <CalendarCheck size={20} />, path: '/attendance', roles: ['student', 'admin'] },
-    { name: 'Complaints', icon: <ClipboardList size={20} />, path: '/complaints' },
+    { name: 'Events', icon: <CalendarCheck size={20} />, path: '/events' },
+    { name: 'Incident Logs', icon: <ShieldCheck size={20} />, path: '/admin/complaints', roles: ['admin'] },
+    { name: 'User Management', icon: <Users size={20} />, path: '/admin/users', roles: ['admin'] },
+    { name: 'Attendance', icon: <CalendarCheck size={20} />, path: '/attendance', roles: ['student', 'faculty'] },
+    { name: 'Complaints', icon: <ClipboardList size={20} />, path: '/complaints', roles: ['student'] },
     { name: 'Notes Sharing', icon: <FileText size={20} />, path: '/notes', roles: ['student', 'admin'] },
-    { name: 'Lost & Found', icon: <Search size={20} />, path: '/lostfound', roles: ['student', 'admin'] },
+    { name: 'Lost & Found', icon: <Search size={20} />, path: '/lostfound', roles: ['student'] },
   ];
+
 
   const filteredItems = menuItems.filter(item => !item.roles || item.roles.includes(role));
 
