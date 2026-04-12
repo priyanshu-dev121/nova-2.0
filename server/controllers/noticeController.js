@@ -40,4 +40,9 @@ const getNotices = async (req, res) => {
     
     res.json(notices);
   } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = { createNotice, getNotices };
+
