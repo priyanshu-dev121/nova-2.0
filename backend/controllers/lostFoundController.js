@@ -6,9 +6,16 @@ const Claim = require('../models/Claim');
 // @access  Private
 const createLostFoundListing = async (req, res) => {
   const { title, description, contactInfo, type, category, location, date } = req.body;
+  
+  console.log(`\n--- Lost & Found Post Attempt ---`);
+  console.log(`User: ${req.user.name} (${req.user._id})`);
+  console.log(`Title: ${title}`);
+  console.log(`Type: ${type}`);
+  console.log(`File: ${req.file ? req.file.originalname : 'MISSING'}`);
 
   try {
     if (!req.file) {
+      console.log('❌ Post failed: No image uploaded');
       return res.status(400).json({ message: 'Please upload an image' });
     }
 
@@ -24,6 +31,7 @@ const createLostFoundListing = async (req, res) => {
       userId: req.user._id,
     });
 
+    console.log(`✅ Post successful: ${item._id}`);
     res.status(201).json(item);
   } catch (error) {
     res.status(500).json({ message: error.message });

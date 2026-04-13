@@ -84,7 +84,9 @@ const LostFoundPage = () => {
       showToast('Listing synchronized with Campus Core', 'success');
       fetchItems();
     } catch (err) {
-      showToast('Validation or Upload Error', 'error');
+      console.error('Post Error:', err);
+      const errorMsg = err.response?.data?.message || 'Validation or Upload Error';
+      showToast(errorMsg, 'error');
     } finally {
       setLoading(false);
     }

@@ -91,6 +91,10 @@ const LostFoundForm = ({ isOpen, onClose, onSubmit, loading }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!file) {
+      alert('Please upload an image of the item.');
+      return;
+    }
     const data = new FormData();
     Object.keys(formData).forEach(key => data.append(key, formData[key]));
     if (file) data.append('image', file);
@@ -172,6 +176,7 @@ const LostFoundForm = ({ isOpen, onClose, onSubmit, loading }) => {
               <label><User size={16} /> Alternate Contact</label>
               <input 
                 type="text" 
+                required
                 placeholder="WhatsApp or Phone"
                 value={formData.contactInfo}
                 onChange={e => setFormData({...formData, contactInfo: e.target.value})}
@@ -205,7 +210,7 @@ const LostFoundForm = ({ isOpen, onClose, onSubmit, loading }) => {
                   ) : (
                     <div className="upload-placeholder">
                       <Camera size={32} />
-                      <p>Click to upload photo</p>
+                      <p>Click to upload photo (Required)</p>
                     </div>
                   )}
                 </label>
