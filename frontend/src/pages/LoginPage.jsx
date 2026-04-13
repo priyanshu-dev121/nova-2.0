@@ -50,13 +50,28 @@ const LoginPage = () => {
       showToast('Logged in successfully! Welcome back.', 'success');
       navigate('/dashboard');
     } catch (err) {
-      if (err.response?.status === 401 && err.response?.data?.message.includes('verify')) {
-        navigate('/verify-otp', { state: { email: formData.email } });
+      console.error('Login Error Details:', err);
+      
+      if (!err.response) {
+        // Network error (backend unreachable)
+        const networkError = 'Unable to connect to the server. Please check your internet or ensure the backend is running.';
+        setError(networkError);
+        showToast(networkError, 'error');
+      } else if (err.response.status === 401) {
+        // Specific authentication errors
+        const message = err.response.data?.message || 'Invalid email or password.';
+        if (message.toLowerCase().includes('verify')) {
+          navigate('/verify-otp', { state: { email: formData.email } });
+        } else {
+          setError(message);
+          showToast(message, 'error');
+          setShowForgot(true);
+        }
       } else {
-        const errorMsg = err.response?.data?.message || 'Invalid email or password.';
+        // Other errors (500, 404, etc.)
+        const errorMsg = err.response.data?.message || `Server error (${err.response.status}). Please try again later.`;
         setError(errorMsg);
         showToast(errorMsg, 'error');
-        setShowForgot(true);
       }
     } finally {
       setLoading(false);

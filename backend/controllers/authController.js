@@ -118,12 +118,15 @@ const verifyEmail = async (req, res) => {
 const login = async (req, res) => {
   let { email, password } = req.body;
   email = email.toLowerCase().trim();
+  console.log(`\n--- Login Attempt: ${email} ---`);
+
   try {
     // 1. Check for Hardcoded Single Admin (Prioritize over DB)
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@bbdu.ac.in';
     const adminPass = process.env.ADMIN_PASSWORD || 'adminbbd@1';
 
     if (email === adminEmail && password === adminPass) {
+      console.log('✅ Admin login successful');
       return res.json({
         _id: '65f1a2b3c4d5e6f7a8b9c0d1',
         name: 'Campus Admin',
@@ -133,26 +136,35 @@ const login = async (req, res) => {
       });
     }
 
-
     // 2. Regular Login (Student & Pre-generated Faculty)
     const user = await User.findOne({ email });
 
-    if (user && (await user.matchPassword(password))) {
-      if (!user.isVerified) {
-        return res.status(401).json({ message: 'Please verify your email first' });
-      }
-
-      res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        token: generateToken(user._id),
-      });
-    } else {
-      res.status(401).json({ message: 'Invalid email or password' });
+    if (!user) {
+      console.log('❌ Login failed: User not found in database');
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
+
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch) {
+      console.log('❌ Login failed: Password mismatch');
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    if (!user.isVerified) {
+      console.log('⚠️ Login blocked: Email not verified');
+      return res.status(401).json({ message: 'Please verify your email first' });
+    }
+
+    console.log(`✅ Login successful: ${user.name} (${user.role})`);
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      token: generateToken(user._id),
+    });
   } catch (error) {
+    console.error('❌ Server Error during login:', error.message);
     res.status(500).json({ message: error.message });
   }
 };
