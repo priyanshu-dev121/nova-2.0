@@ -21,6 +21,11 @@ import NovaChat from './components/NovaChat';
 import ProfilePage from './pages/ProfilePage';
 import ErrorBoundary from './components/ErrorBoundary';
 
+import HowItWorksPage from './pages/HowItWorksPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsPage from './pages/TermsPage';
+import RefundPage from './pages/RefundPage';
+
 function App() {
   return (
     <ToastProvider>
@@ -28,6 +33,10 @@ function App() {
         <ErrorBoundary>
           <Routes>
             <Route path="/" element={<LandingPage />} />
+            <Route path="/how-it-works" element={<HowItWorksPage />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms-conditions" element={<TermsPage />} />
+            <Route path="/refund-policy" element={<RefundPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/verify-otp" element={<VerifyOTPPage />} />

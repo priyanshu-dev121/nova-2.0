@@ -97,6 +97,7 @@ const LandingPage = () => {
           </div>
           <div className="nav-links flex items-center gap-8">
             <a href="#features">Features</a>
+            <span className="nav-link cursor-pointer" onClick={() => navigate('/how-it-works')}>How it Works</span>
             <a href="#about">About</a>
             <button className="btn-secondary" onClick={() => navigate('/login')}>Login</button>
             <button className="btn-primary" onClick={() => navigate('/signup')}>Get Started</button>
@@ -168,6 +169,8 @@ const LandingPage = () => {
               { title: 'Instant Help', desc: 'Direct portal to file complaints and track resolution status in real-time.', icon: <ShieldCheck /> },
               { title: 'Lost & Found', desc: 'Broadcast lost belongings or claim found items within the campus community.', icon: <Search /> },
               { title: 'Event Hub', desc: 'Stay updated with upcoming workshops, seminars, and campus-wide fests.', icon: <Calendar /> },
+              { title: 'Campus Marketplace', desc: 'Seamlessly buy and sell second-hand books, electronics, and essentials.', icon: <Zap /> },
+              { title: 'Smart Canteen', desc: 'Digital menu, dietary info, and skip-the-line pre-ordering for students.', icon: <Sparkles /> },
             ].map((f, i) => (
               <div key={i} className="feature-card fade-up" style={{ animationDelay: `${0.2 * i}s` }}>
                 <div className="feature-icon">{f.icon}</div>

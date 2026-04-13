@@ -25,12 +25,12 @@ const footerLinks = {
     { label: "About Campus Nova", href: "/about" },
     { label: "Our Story", href: "/story" },
     { label: "Team Developers", href: "/developers" },
-    { label: "Privacy Policy", href: "/terms" },
-    { label: "Rulebook", href: "/terms" },
+    { label: "Privacy Policy", href: "/privacy-policy" },
+    { label: "Rulebook", href: "/terms-conditions" },
   ],
   Support: [
-    { label: "support@campusnova.com", href: "mailto:support@campusnova.com", icon: Mail },
-    { label: "+91 8840xxxxxx", href: "tel:+918840000000", icon: Phone },
+    { label: "campusnova1@gmail.com", href: "mailto:campusnova1@gmail.com", icon: Mail },
+    { label: "+91 9458128469", href: "tel:+919458128469", icon: Phone },
     { label: "BBD University, Lucknow, UP - 226028", href: "#", icon: MapPin },
   ],
 };
@@ -43,7 +43,7 @@ const XIcon = ({ className }) => (
 
 const socials = [
   { Icon: XIcon, href: "#", label: "X (Twitter)" },
-  { Icon: MessageCircle, href: "#", label: "Discord" },
+  { Icon: MessageCircle, href: "https://wa.me/919458128469?text=Hello%20Campus%20Nova%20Team!%20I%20have%20a%20query...", label: "WhatsApp" },
   { Icon: Briefcase, href: "#", label: "LinkedIn" },
 ];
 
@@ -109,11 +109,11 @@ const Footer = () => {
                   key={label}
                   href={href}
                   aria-label={label}
-                  whileHover={{ y: -4, scale: 1.15 }}
-                  transition={{ type: "spring", stiffness: 300 }}
+                  whileHover={{ y: -6, scale: 1.25 }}
+                  transition={{ type: "spring", stiffness: 350 }}
                   className="social-link"
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className="w-5 h-5" />
                 </motion.a>
               ))}
             </div>
@@ -147,9 +147,9 @@ const Footer = () => {
         <div className="footer-bottom">
           <span>© {new Date().getFullYear()} Campus Nova. All rights reserved.</span>
           <div className="footer-legal-links">
-            <Link to="/terms">Privacy Policy</Link>
-            <Link to="/terms">Terms & Conditions</Link>
-            <Link to="/terms">Rulebook</Link>
+            <Link to="/privacy-policy">Privacy Policy</Link>
+            <Link to="/terms-conditions">Terms & Conditions</Link>
+            <Link to="/refund-policy">Refund Policy</Link>
           </div>
         </div>
       </div>

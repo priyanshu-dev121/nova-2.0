@@ -98,22 +98,25 @@
 }
 
 .social-link {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 3rem;
+  height: 3rem;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.6);
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .social-link:hover {
-  color: #818cf8;
-  border-color: rgba(129, 140, 248, 0.5);
-  background: rgba(129, 140, 248, 0.1);
+  color: #ffffff;
+  border-color: var(--primary);
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.2), rgba(147, 51, 234, 0.2));
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+  transform: rotate(5deg);
 }
 
 .footer-col-title {
