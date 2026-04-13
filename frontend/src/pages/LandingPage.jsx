@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Sparkles, CheckCircle, Globe, Shield, Zap } from 'lucide-react';
+import { ArrowRight, Sparkles, CheckCircle, Globe, Shield, Zap, Library, Search, Calendar, ShieldCheck } from 'lucide-react';
 import Footer from '../components/Footer';
 import './LandingPage.css';
 
@@ -163,10 +163,11 @@ const LandingPage = () => {
           <h2 className="section-title">One Platform, Endless Possibilities</h2>
           <div className="features-grid">
             {[
-              { title: 'Smart Attendance', desc: 'Mark your presence with a single tap or QR code.', icon: <CheckCircle /> },
-              { title: 'Mess Explorer', desc: 'Real-time menus and schedules for all campus mess halls.', icon: <Zap /> },
-              { title: 'Notes Central', desc: 'Share and access study resources in seconds.', icon: <Globe /> },
-              { title: 'Instant Help', desc: 'File complaints and track resolutions directly.', icon: <Shield /> },
+              { title: 'Smart Attendance', desc: 'Securely mark your presence with automated QR scans and tap-to-verify.', icon: <CheckCircle /> },
+              { title: 'Academic Vault', desc: 'Centralized repository for study materials, notes, and previous year resources.', icon: <Library /> },
+              { title: 'Instant Help', desc: 'Direct portal to file complaints and track resolution status in real-time.', icon: <ShieldCheck /> },
+              { title: 'Lost & Found', desc: 'Broadcast lost belongings or claim found items within the campus community.', icon: <Search /> },
+              { title: 'Event Hub', desc: 'Stay updated with upcoming workshops, seminars, and campus-wide fests.', icon: <Calendar /> },
             ].map((f, i) => (
               <div key={i} className="feature-card fade-up" style={{ animationDelay: `${0.2 * i}s` }}>
                 <div className="feature-icon">{f.icon}</div>

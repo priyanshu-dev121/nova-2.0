@@ -73,7 +73,7 @@ const SignupPage = () => {
     try {
       const { data } = await API.post('/auth/signup', {
         name: formData.name,
-        email: formData.email,
+        email: formData.email.toLowerCase().trim(),
         password: formData.password,
       });
       

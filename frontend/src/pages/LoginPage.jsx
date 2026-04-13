@@ -42,7 +42,10 @@ const LoginPage = () => {
         return;
       }
 
-      const { data } = await API.post('/auth/login', formData);
+      const { data } = await API.post('/auth/login', {
+        email: formData.email.toLowerCase().trim(),
+        password: formData.password,
+      });
       localStorage.setItem('userInfo', JSON.stringify(data));
       showToast('Logged in successfully! Welcome back.', 'success');
       navigate('/dashboard');

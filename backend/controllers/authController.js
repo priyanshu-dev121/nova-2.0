@@ -8,7 +8,8 @@ const crypto = require('crypto');
 // @route   POST /api/auth/signup
 // @access  Public
 const signup = async (req, res) => {
-  const { name, email, password } = req.body;
+  let { name, email, password } = req.body;
+  email = email.toLowerCase().trim();
 
   try {
     const role = 'student';
@@ -115,7 +116,8 @@ const verifyEmail = async (req, res) => {
 // @route   POST /api/auth/login
 // @access  Public
 const login = async (req, res) => {
-  const { email, password } = req.body;
+  let { email, password } = req.body;
+  email = email.toLowerCase().trim();
   try {
     // 1. Check for Hardcoded Single Admin (Prioritize over DB)
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@bbdu.ac.in';
