@@ -67,8 +67,13 @@ const LoginPage = () => {
           showToast(message, 'error');
           setShowForgot(true);
         }
+      } else if (err.response.status === 404) {
+        // Specifically handle 404 to help with URL debugging
+        const errorMsg = `API Not Found (404). Check your VITE_API_BASE_URL. Failing URL: ${err.config?.baseURL}${err.config?.url}`;
+        setError(errorMsg);
+        showToast('Connection error: API not found.', 'error');
       } else {
-        // Other errors (500, 404, etc.)
+        // Other errors (500, etc.)
         const errorMsg = err.response.data?.message || `Server error (${err.response.status}). Please try again later.`;
         setError(errorMsg);
         showToast(errorMsg, 'error');
