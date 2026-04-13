@@ -170,6 +170,9 @@ const AdminUserManagementPage = () => {
                                  <span className="text-[10px] font-black px-3 py-1 bg-black/5 rounded-lg text-black/60 tracking-wider">
                                     JOINED: {new Date(u.createdAt).toLocaleDateString()}
                                  </span>
+                                 <span className={`text-[10px] font-black px-3 py-1 rounded-lg tracking-wider ${u.isVerified ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700 animate-pulse'}`}>
+                                    {u.isVerified ? 'VERIFIED' : 'UNVERIFIED'}
+                                 </span>
                               </div>
                            </div>
                         </div>

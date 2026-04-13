@@ -65,14 +65,17 @@ const signup = async (req, res) => {
 
     try {
       await sendEmail({ email: user.email, subject: 'Campus Nova - Verification', message, html });
+      console.log(`✅ Verification email sent to ${user.email}`);
       res.status(201).json({ message: 'Success! Please check your email for the verification code.', email: user.email });
     } catch (err) {
+      console.error(`❌ Signup Email Error for ${user.email}:`, err.message);
       res.status(201).json({ message: 'Account created, but we had trouble sending the email. Please try logging in to resend.', email: user.email });
     }
   } catch (error) {
     if (error.code === 11000) {
       return res.status(400).json({ message: 'This email is already registered. Please try logging in.' });
     }
+    console.error(`❌ Global Signup Error:`, error.message);
     res.status(500).json({ message: 'Something went wrong on our end. Please try again later.' });
   }
 };
@@ -82,16 +85,19 @@ const signup = async (req, res) => {
 // @access  Public
 const verifyEmail = async (req, res) => {
   const { email, otp } = req.body;
+  console.log(`\n--- OTP Verification Attempt for ${email} ---`);
 
   try {
     const otpRecord = await OTP.findOne({ email, otp });
 
     if (!otpRecord) {
+      console.log(`❌ Verification failed: Invalid or expired OTP for ${email}`);
       return res.status(400).json({ message: 'Invalid or expired OTP' });
     }
 
     const user = await User.findOne({ email });
     if (!user) {
+      console.log(`❌ Verification failed: User not found for ${email}`);
       return res.status(404).json({ message: 'User not found' });
     }
 
@@ -99,6 +105,7 @@ const verifyEmail = async (req, res) => {
     await user.save();
     await OTP.deleteOne({ _id: otpRecord._id });
 
+    console.log(`✅ Verification successful: ${email} is now verified`);
     res.json({
       _id: user._id,
       name: user.name,
@@ -108,6 +115,7 @@ const verifyEmail = async (req, res) => {
       message: 'Email verified successfully!',
     });
   } catch (error) {
+    console.error(`❌ Verification Server Error:`, error.message);
     res.status(500).json({ message: error.message });
   }
 };
