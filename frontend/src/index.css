@@ -1,10 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&family=Outfit:wght@100;400;700;900&display=swap');
 
 :root {
-  --primary: #4f46e5;
+  --primary: #6366f1;
   --primary-hover: #4338ca;
+  --primary-glow: rgba(99, 102, 241, 0.4);
   --secondary: #64748b;
-  --background: #ffffff;
+  --background: #f8fafc;
   --foreground: #0f172a;
   --card: #ffffff;
   --card-foreground: #0f172a;
@@ -12,6 +13,8 @@
   --input: #e2e8f0;
   --ring: #4f46e5;
   --radius: 0.75rem;
+  --glass: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.4);
 
   /* Animation durations */
   --shorter: 0.2s;
@@ -25,19 +28,15 @@
   padding: 0;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;400;700;900&display=swap');
-
-:root {
-  --primary: #6366f1;
-  --primary-glow: rgba(99, 102, 241, 0.4);
-  --glass: rgba(255, 255, 255, 0.8);
-  --glass-border: rgba(255, 255, 255, 0.4);
-}
-
 body {
   margin: 0;
-  font-family: 'Outfit', sans-serif;
-  background-color: #f8fafc;
+  font-family: 'Outfit', 'Inter', sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  overflow-x: hidden;
 }
 
 /* Global Premium Design Tokens - Compressed Scale */
@@ -168,15 +167,7 @@ body {
   scale: 0.8 !important;
 }
 
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: var(--background);
-  color: var(--foreground);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  line-height: 1.5;
-  overflow-x: hidden;
-}
+
 
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Poppins', sans-serif;
