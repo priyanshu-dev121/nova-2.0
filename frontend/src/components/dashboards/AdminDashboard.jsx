@@ -13,7 +13,9 @@ import {
   Bell,
   Send,
   Activity,
-  ShieldAlert
+  ShieldAlert,
+  AlertCircle,
+  ChevronRight
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import API from '../../api/axiosConfig';

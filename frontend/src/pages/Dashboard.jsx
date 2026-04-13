@@ -5,10 +5,12 @@ import API from '../api/axiosConfig';
 import StudentDashboard from '../components/dashboards/StudentDashboard';
 import FacultyDashboard from '../components/dashboards/FacultyDashboard';
 import AdminDashboard from '../components/dashboards/AdminDashboard';
+import MobileHeader from '../components/MobileHeader';
 import './Dashboard.css';
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
+  const [showSidebar, setShowSidebar] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,9 +31,15 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-layout">
-      <Sidebar handleLogout={handleLogout} />
+      <MobileHeader showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
       
-      <main className="main-content">
+      <Sidebar 
+        handleLogout={handleLogout} 
+        showSidebar={showSidebar} 
+        setShowSidebar={setShowSidebar}
+      />
+      
+      <main className={`main-content ${showSidebar ? 'sidebar-open' : ''}`}>
         {/* Render appropriate dashboard based on user role */}
         {user.role === 'student' && <StudentDashboard user={user} />}
         {user.role === 'faculty' && <FacultyDashboard user={user} />}

@@ -14,7 +14,7 @@ import {
   Library
 } from 'lucide-react';
 
-const Sidebar = ({ handleLogout }) => {
+const Sidebar = ({ handleLogout, showSidebar, setShowSidebar }) => {
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
   const role = userInfo?.role || 'student';
 
@@ -36,7 +36,16 @@ const Sidebar = ({ handleLogout }) => {
   const filteredItems = menuItems.filter(item => !item.roles || item.roles.includes(role));
 
   return (
-    <aside className="sidebar">
+    <>
+      {/* Mobile Overlay */}
+      {showSidebar && (
+        <div 
+          className="sidebar-overlay" 
+          onClick={() => setShowSidebar(false)}
+        />
+      )}
+
+      <aside className={`sidebar ${showSidebar ? 'open' : ''}`}>
       <div className="sidebar-header logo">
         <Sparkles className="text-primary" size={28} />
         <h1 className="logo-text">Campus Nova</h1>
@@ -48,6 +57,11 @@ const Sidebar = ({ handleLogout }) => {
             key={item.name} 
             to={item.path} 
             className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}
+            onClick={() => {
+              if (window.innerWidth <= 1024) {
+                setShowSidebar(false);
+              }
+            }}
           >
             {item.icon}
             <span>{item.name}</span>
@@ -62,6 +76,7 @@ const Sidebar = ({ handleLogout }) => {
         </button>
       </div>
     </aside>
+    </>
   );
 };
 

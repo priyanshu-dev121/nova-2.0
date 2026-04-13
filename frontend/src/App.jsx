@@ -19,30 +19,33 @@ import ClassLogsPage from './pages/ClassLogsPage';
 import MaterialLogsPage from './pages/MaterialLogsPage';
 import NovaChat from './components/NovaChat';
 import ProfilePage from './pages/ProfilePage';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
   return (
     <ToastProvider>
       <Router>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/verify-otp" element={<VerifyOTPPage />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/attendance" element={<AttendancePage />} />
-          <Route path="/complaints" element={<ComplaintsPage />} />
-          <Route path="/admin/complaints" element={<AdminComplaintsPage />} />
-          <Route path="/admin/users" element={<AdminUserManagementPage />} />
-          <Route path="/events" element={<EventsPage />} />
-          <Route path="/notes" element={<NotesPage />} />
-          <Route path="/academic-vault" element={<AcademicVaultPage />} />
-          <Route path="/lostfound" element={<LostFoundPage />} />
-          <Route path="/mess" element={<MessPage />} />
-          <Route path="/class-logs" element={<ClassLogsPage />} />
-          <Route path="/material-logs" element={<MaterialLogsPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-        </Routes>
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/verify-otp" element={<VerifyOTPPage />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/attendance" element={<AttendancePage />} />
+            <Route path="/complaints" element={<ComplaintsPage />} />
+            <Route path="/admin/complaints" element={<AdminComplaintsPage />} />
+            <Route path="/admin/users" element={<AdminUserManagementPage />} />
+            <Route path="/events" element={<EventsPage />} />
+            <Route path="/notes" element={<NotesPage />} />
+            <Route path="/academic-vault" element={<AcademicVaultPage />} />
+            <Route path="/lostfound" element={<LostFoundPage />} />
+            <Route path="/mess" element={<MessPage />} />
+            <Route path="/class-logs" element={<ClassLogsPage />} />
+            <Route path="/material-logs" element={<MaterialLogsPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+          </Routes>
+        </ErrorBoundary>
         <NovaChat />
       </Router>
     </ToastProvider>
