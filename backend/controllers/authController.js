@@ -69,7 +69,12 @@ const signup = async (req, res) => {
       res.status(201).json({ message: 'Success! Please check your email for the verification code.', email: user.email });
     } catch (err) {
       console.error(`❌ Signup Email Error for ${user.email}:`, err.message);
-      res.status(201).json({ message: 'Account created, but we had trouble sending the email. Please try logging in to resend.', email: user.email });
+      // Change: Return an error so the frontend doesn't falsely navigate.
+      // The user is already created, so a retry will hit the "existing unverified user" flow.
+      res.status(500).json({ 
+        message: 'Account created, but we could not send the verification email. Please try logging in to resend the code.', 
+        email: user.email 
+      });
     }
   } catch (error) {
     if (error.code === 11000) {
