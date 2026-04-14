@@ -29,9 +29,19 @@ API.interceptors.request.use((config) => {
 API.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('userInfo');
-      window.location.href = '/login';
+    const { response, config } = error;
+    
+    if (response?.status === 401) {
+      const message = response.data?.message?.toLowerCase() || '';
+      const isAuthEndpoint = config.url.includes('/login') || config.url.includes('/signup');
+      const isVerifyError = message.includes('verify');
+
+      // Only redirect to login if it's NOT an auth endpoint and NOT a verification error
+      if (!isAuthEndpoint && !isVerifyError) {
+        console.log('🚪 Session expired or unauthorized. Redirecting to login...');
+        localStorage.removeItem('userInfo');
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
